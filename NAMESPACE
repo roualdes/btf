@@ -1,0 +1,3 @@
+import('Rcpp', 'RcppArmadillo', 'coda')
+useDynLib(btf)
+exportPattern("^[[:alpha:]]+")
