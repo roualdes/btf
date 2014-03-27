@@ -6,10 +6,12 @@
 using namespace arma; 
 using namespace Rcpp;
 
-List tf(const colvec& y, const colvec& l, const mat& D, const colvec& P, 
-        const int& n, const int& k, const double& e, const double& tau){
+List approx_tf(const colvec& y, const colvec& l, const mat& D, const int& n, 
+               const int& k, const double& e, const double& tau){
+
   // author Edward A. Roualdes
   // TODO: use sp_mat
+  // initialize some values
   const int J = l.n_rows;       // number of lambdas
   const mat I = eye(n,n);       // make identity
   const int nk = n-k-1;         // dim phi
@@ -21,10 +23,7 @@ List tf(const colvec& y, const colvec& l, const mat& D, const colvec& P,
   mat phi(nk,nk, fill::zeros);  // initialize phi
   colvec bOld(n);
 
-  // P.print("P:");
-  // D.row(1).print("D[1,]:");
-    
-
+  // algorithm
   for (int j=0; j<J; j++) {
     int iter = 0;
     while (iter < maxiter) {
@@ -39,8 +38,9 @@ List tf(const colvec& y, const colvec& l, const mat& D, const colvec& P,
       if (norm(b - bOld, "Inf") < tau) break;
       ++iter;
     }
+    // store estimates for each lambda
     bOut.col(j) = b;
-    iterOut(j) = iter;
+    iterOut(j) = iter;          // number iterations at convergence
   }
 
   return List::create(Named("coefficients") = bOut,

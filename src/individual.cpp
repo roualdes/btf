@@ -13,11 +13,12 @@ public:
     // general info
     n = y.n_rows;
     nk = n-k-1;
-    I = speye(n,n);
+    I = eye(n,n);               // I = speye(n,n); 
+    // x = linspace<colvec>(1, 100, n) / n; // TODO as argument of constructor
 
     // initialize
-    init_D(n, k, nk);
-    init_l2(rho, delta);
+    init_D(n, nk, k); // init_spD(n, nk, k);    // init_Delta(n, nk, k, x); 
+    init_l2(rho_, delta_);
     init_o2(nk);
     init_s2();
     init_beta();
@@ -30,14 +31,14 @@ public:
   void set_l2(double val) {
     l2 = val;
   }
-  void set_o2(colvec val) {
+  void set_o2(const colvec& val) {
     o2 = val;
   }
-  void set_beta(colvec val) {
+  void set_beta(const colvec& val) {
     beta = val;
   }
-  void set_sigma(colvec eta_) {
-    mat W = diagmat(eta_);
+  void set_sigma(const colvec& val) {
+    mat W = diagmat(val);
     sigma = D.t()*W*D;
   }
 
@@ -54,13 +55,16 @@ public:
       return nu2/x;
     } 
   }
-
   colvec rmvnorm(const colvec& mu_, const mat& sigma_) {
     colvec Y = randn<colvec>(sigma_.n_cols);
     mat b = mu_.t() + Y.t()*chol(sigma_);
     return conv_to<colvec>::from(b);
   }
-
+  colvec rmvnorm2(const colvec& mu_, const mat& retval_) {
+    colvec Y = randn<colvec>(retval_.n_cols);
+    mat b = mu_.t() + Y.t()*retval_;
+    return conv_to<colvec>::from(b);
+  }
   NumericVector get_gamma(int n_, double shape_, double rate_) {
     RNGScope scope;
     NumericVector x = rgamma(n_, shape_, rate_);
@@ -68,71 +72,35 @@ public:
   }
 
   // fields
-  colvec y, o2, beta;
+  colvec y, o2, beta, dx, x;
   int n, k, nk;
   double rho, delta, l2, s2;
   mat D, sigma, I;
-
-  // TODO: use sp_mat
+  // sp_mat D, sigma, I;
 
 private:
 
   // initializers
   void init_l2(double rho_, double delta_) {
-    NumericVector L = get_gamma(1, nk+rho_, 1+delta);
+    NumericVector L = get_gamma(1, nk+rho_, 1.0+delta_);
     l2 = L[0];
   }
-
   void init_o2(int nk_) {
     RNGScope scope;
-    NumericVector O = rexp(nk_, l2/2.0);
+    NumericVector O = rexp(nk_, 0.5);
     colvec O2(O.begin(), O.size(), false);
     set_sigma(1.0/O2);
     o2 = O2;
   }
-
   void init_s2() {
-    NumericVector S = get_gamma(1, 1, 1);
-    s2 = 1/S[0];
+    NumericVector S = get_gamma(1, 0.1, 1.0); // user specified like lambda?
+    s2 = 1/S[0];                              // sigma2 ~ invgamma
   }
-
   void init_beta() {
-    beta = y;
+    beta = y;                   // reasonable?
   }
-
-  void init_D(int n_, int k_, int nk_) {
-    // TODO: use sp_mat
-    //   int n1 = n_-1;
-    //   int no_vals = n_+n_-1;      // number of values in d^(0)
-
-    //   // create d^(0)
-    //   // create values to be inserted into d^(0)
-    //   colvec v = ones<colvec>(no_vals); // init values to be inserted into d^(0)
-    //   v.rows(0, n1) *= -1.0;
-
-    //   // create locations of values in d^(0)
-    //   urowvec l = linspace<urowvec>(0, n1, n_);
-    //   umat loc(2, no_vals);
-    //   loc.submat( span(0,0), span(0, n1)) = l;
-    //   loc.submat( span(1,1), span(0, n1)) = l;
-    //   loc.submat( span(0,0), span(n_, no_vals-1)) = l.cols(0, n1-1);
-    //   loc.submat( span(1,1), span(n_, no_vals-1)) = l.cols(1, n1);
-
-    //   // fill D^(0)
-    //   sp_mat d(loc, v);
-    //   sp_mat d0 = d;
-    //   if (k_ != 0) {
-    //     int i=0;
-    //     while (i < k_) {
-    //       d *= d0;
-    //       i++;
-    //     }
-    //   }
-    //   D = d.rows(0, nk_-1);
-    // }
-    
-    // using mat class until Armadillo has more sp_mat funcitonality
-    mat d(n, n, fill::zeros);
+  void init_D(int n_, int nk_, int k_) {
+    mat d(n_, n_, fill::zeros);
     d.diag() -= 1.0;
     d.diag(1) += 1.0;
     mat d0 = d;
@@ -145,33 +113,115 @@ private:
       }
       D = d.rows(0, (nk_-1));
     }
+  void init_Delta(int n_, int nk_, int k_, colvec x_) {
+    mat d(nk_, n_, fill::zeros);
+    double fk = factorial(k_);
+    for (int i=0; i<nk_; i++) {
+      int k1 = i+k_+1;
+      double diff = x_(i) - x_(k1);
+      colvec subx = x_.rows(i,k1);
+      for (int j=i; j<k1+1; j++) {
+        d(i,j) = (diff*fk)/omega(subx, x_(j));
+      }
+    }
+    D = d;
+  }
+  void init_spD(int n_, int nk_, int k_) {
+    // initialize first difference matrix
+    int N = n_+(n_-1);          // number of elements to fill d
+    colvec v(N, fill::ones);
+    v.rows(n_, N-1) *= -1.0;    // values of sparse matrix
+    umat loc(2, N);             // locations
+    uvec pos(2);                // helps fill loc
+    for (int i=0; i<n_; i++) {
+      pos.fill(i);     
+      loc.col(i) = pos;         // fill diag
+      if (i < n_-1) {
+        pos(1) += 1.0;
+        loc.col(i+n_) = pos;      // fill one above diag        
+      }
+    }
+    sp_mat d(loc, v);
+    // compute difference matrix recursively
+    sp_mat d0 = d;
+    if (k_ != 0) {
+      int i=0;
+      while (i < k_) {
+        d *= d0;
+        i++;
+      }
+    }
+    D = d.rows(0, nk_-1);
+  }
+
+  // utility
+  double factorial(double k_) {
+    double out = 1.0;
+    if (k_ > 1) {
+      out = k_*factorial(k_-1);
+    } 
+    return out;
+  }
+  double omega(colvec x_, double xj_) {
+    colvec diffs = xj_ - x_;
+    double out = 1;
+    for (int j=0; j<x_.n_rows; j++) {
+      if (diffs[j] != 0.0) {
+        out *= diffs[j];
+      }
+    }
+      return(out);
+  }
 };
+
 
 
 // updaters
 void upBeta(individual* i) {
-  mat sigma_inv = inv_sympd(i->I + i->sigma);
-  i->set_beta(i->rmvnorm(sigma_inv*i->y, i->s2*sigma_inv));
-}
+  // invert matrix
+  mat siginv = inv_sympd(i->I+i->sigma);
+  i->set_beta(i->rmvnorm(siginv*i->y, i->s2*siginv));
 
+  // svd
+  // doesn't seem to work, but I can't figure out why not
+  // mat U;
+  // vec s;
+  // mat V;
+  // mat E = i->I+i->sigma;
+  // svd(U,s,V, E);
+  // i->set_beta(i->rmvnorm2(U*diagmat(1/s)*V.t()*i->y,
+  //                         U*diagmat(i->s2/sqrt(s))*V.t()));
+
+  // sparse version if I can ever use it
+  // vec eigval;
+  // mat eigvec;
+  // sp_mat E = i->I+i->sigma;
+  // eigs_sym(eigval, eigvec, E, i->n);
+  
+  // i->set_beta(i->rmvnorm2((eigvec*diagmat(1/eigval)*eigvec.t())*i->y,
+  //                         eigvec*diagmat(i->s2/sqrt(eigval))*eigvec.t()));
+}
 void upLambda(individual* i) {
-  NumericVector l = i->get_gamma(1, i->nk+i->rho, i->delta+sum(i->o2)/2.0);
+  // gamma (rho, delta) prior
+  // NumericVector l = i->get_gamma(1, i->nk+i->rho, i->delta+sum(i->o2)/2.0);
+  // lambda^{-2} prior: requires n-k > 2
+  NumericVector l = i->get_gamma(1, i->nk-1, 2.0/sum(i->o2));
   i->set_l2(l[0]);
 }
-
 void upOmega(individual* i) {
   colvec Db = abs(i->D*i->beta);
-  colvec m = sqrt(i->l2*i->s2)/Db;
+  double l = i->l2;
+  colvec m = sqrt(l*i->s2)/Db;
   colvec eta(i->nk);
   for (int j=0; j<i->nk; j++) {
-    eta(j) = i->rinvGauss(m(j), i->l2);
+    eta(j) = i->rinvGauss(m(j), l);
   }
   i->set_sigma(eta);
   i->set_o2(1.0/eta);
 }
-
 void upSig(individual* i) {
-  colvec rate = dot(i->y-i->beta, i->y-i->beta) + i->beta.t()*i->sigma*i->beta;
+  colvec res = i->y - i->beta;
+  colvec rate = dot(res, res) + i->beta.t()*i->sigma*i->beta;
   NumericVector sig2 = i->get_gamma(1, i->n, 2.0/rate[0]);
   i->set_s2(1/sig2[0]);
 }
@@ -201,4 +251,3 @@ RCPP_MODULE(individual) {
     .method( "rinvGauss", &individual::rinvGauss)
     ;
 }
-

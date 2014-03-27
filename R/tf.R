@@ -5,11 +5,32 @@
 ##' @param iters number of samples
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(y = 'vector', k = 'integer', iters=5000) {
+tf <- function(y='vector' , k='int', iters=1e4, lambda = NULL,
+               l2prior = c('gamma', 'ht')) {
     loadModule('individual', TRUE)
-    ind <- new(individual, y, k, 1, 1)  # initialize new individual
+    ind <- new(individual, y, k, 1, 1) # initialize new individual
+    l2prior <- match.arg(l2prior)
+    upParams <- function(indiv) {
+        ## update in place
+        indiv$upBeta(); indiv$upOmega();
+        if (is.null(lambda)) {
+            if (l2prior == 'ht') {
+                xstar <- prop()
+                a <- 
+                alpha <- min(1, a)
+            } else {
+                indiv$upLambda();                
+            }
+        } else {
+            ind$l2 <- lambda*lambda
+        }
+        indiv$upSig()
+        ## only return what we want a history of
+        c('beta' = indiv$beta, 'l2' = indiv$l2,
+          'omega2' = indiv$o2, 's2' = indiv$s2)
+    }
     chain <- gibbs(iters, upParams, ind, toCoda)
-    attr(chain, 'ind') <- ind        # output all information possible
+    attr(chain, 'ind') <- individual # output all information possible
     class(chain) <- c('btf', class(chain))
     chain
 }

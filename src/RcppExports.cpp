@@ -2,13 +2,14 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
 
-// tf
-using namespace arma;  using namespace Rcpp;  List tf(const colvec& y, const colvec& l, const mat& D, const colvec& P, const int& n, const int& k, const double& e, const double& tau);
-RcppExport SEXP btf_tf(SEXP ySEXP, SEXP lSEXP, SEXP DSEXP, SEXP PSEXP, SEXP nSEXP, SEXP kSEXP, SEXP eSEXP, SEXP tauSEXP) {
+// approx_tf
+using namespace arma;  using namespace Rcpp;  List approx_tf(const colvec& y, const colvec& l, const mat& D, const int& n, const int& k, const double& e, const double& tau);
+RcppExport SEXP btf_approx_tf(SEXP ySEXP, SEXP lSEXP, SEXP DSEXP, SEXP nSEXP, SEXP kSEXP, SEXP eSEXP, SEXP tauSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -16,12 +17,11 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const colvec& >::type y(ySEXP );
         Rcpp::traits::input_parameter< const colvec& >::type l(lSEXP );
         Rcpp::traits::input_parameter< const mat& >::type D(DSEXP );
-        Rcpp::traits::input_parameter< const colvec& >::type P(PSEXP );
         Rcpp::traits::input_parameter< const int& >::type n(nSEXP );
         Rcpp::traits::input_parameter< const int& >::type k(kSEXP );
         Rcpp::traits::input_parameter< const double& >::type e(eSEXP );
         Rcpp::traits::input_parameter< const double& >::type tau(tauSEXP );
-        using namespace arma;  using namespace Rcpp;  List __result = tf(y, l, D, P, n, k, e, tau);
+        using namespace arma;  using namespace Rcpp;  List __result = approx_tf(y, l, D, n, k, e, tau);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

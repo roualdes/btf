@@ -3,10 +3,10 @@
 \alias{btf}
 \docType{package}
 \title{
-Estimates univariate function with domain [0,1].
+  Estimate univariate non-parametric regression function with domain [0,1].
 }
 \description{
-  Trend filtering, as developed by Ryan J. Tibshirani, estimates the function f_0 in the model: y_i = f_0(x_i) + \epsilon_i, i = 1, ..., n. The trendfilter packages provides a Bayesian solution, estimating all parameters from a Gibbs sampler, thus providing confidence intervals and an estimate of the penalty parameter \lambda.
+  Trend filtering, as developed by Ryan J. Tibshirani, estimates the function f_0 in the model: y_i = f_0(x_i) + epsilon_i, i = 1, ..., n. The btf package provides a Bayesian solution, estimating all parameters from a Gibbs sampler, thus providing confidence intervals and an estimate of the penalty parameter lambda.
 }
 \details{
 \tabular{ll}{
@@ -21,18 +21,13 @@ License: \tab GPL (>= 2.0)\cr
 }
 \author{
   Edward A. Roualdesp
-Maintainer: Edward A. Roualdes <edward.roualdes@uky.edu>
+  Maintainer: Edward A. Roualdes <edward.roualdes@uky.edu>
 }
 \references{
-~~ Literature or other references for background information ~~
+  Tibshirani, R. J. and Taylor, J. (2011), "The solution path of the
+  generalized lasso", Annals of Statistics 39 (3) 1335--1371.
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in ~~
-~~ the R documentation directory ~~
-\keyword{ package }
+\keyword{package}
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
+  \code{\link[genlasso]{trendfilter}}
 }

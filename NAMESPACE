@@ -1,3 +1,4 @@
-import('Rcpp', 'RcppArmadillo', 'coda')
+import(RcppArmadillo, RcppZiggurat, RcppEigen, Matrix)
+importFrom(Rcpp, evalCpp)
 useDynLib(btf)
-exportPattern("^[[:alpha:]]+")
+

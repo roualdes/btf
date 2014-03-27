@@ -1,12 +1,23 @@
 Package: btf
 Type: Package
-Title: Estimates univariate function with domain [0,1].
+Title: Estimates univariate function with domain [0,1] via trend filtering
 Version: 1.0
 Date: 2013-12-10
 Author: Edward A. Roualdes
 Maintainer: Edward A. Roualdes <edward.roualdes@uky.edu>
-Description: Trend filtering, as developed by Ryan J. Tibshirani, estimates the function f_0 in the model: y_i = f_0(x_i) + \epsilon_i, i = 1, ..., n. The btf packages provides a Bayesian solution, estimating all parameters from a Gibbs sampler, thus providing confidence intervals and an estimate of the penalty parameter \lambda.
+Description: Trend filtering, as developed by Ryan J. Tibshirani, estimates the
+    function f_0 in the model: y_i = f_0(x_i) + epsilon_i, i = 1, ..., n,
+    epsilon_i ~ sub-gaussian with E(epsilon_i) = 0 via an adaptive polynomial
+    fit of degree k. The btf packages provides a Bayesian solution, estimating
+    posterior distributions, including the penalty paramter lambda, from a
+    Gibbs sampler.
 License: GPL (>= 2.0)
-Depends: Rcpp (>= 0.10.6), RcppArmadillo (>= 0.4.00), coda
-LinkingTo: Rcpp, RcppArmadillo
-RcppModules: individual
+Depends:
+    Rcpp (>= 0.11.0),
+    RcppArmadillo (>= 0.4.000.4),
+    RcppEigen (>= 0.3.2.1.1),
+    RcppZiggurat,
+    Matrix,
+    coda
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppZiggurat
+RcppModules: individual, ind
