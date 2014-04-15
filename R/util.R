@@ -24,5 +24,19 @@ cols <- c('orange1' = "#FFBF80", 'orange2' = "#FF8000",
           'purple1' = "#CCBFFF", 'puple2' = "#664CFF",
           'red1' = "#FF99BF", 'red2' = "#E61A33")
 
-## TODO write getPostEst function
 
+##' get posterior estimates from btf object
+##'
+##' @param btf btf object
+##' @param parameter name of the paramater of interest
+##' @param burn number of sample to discard; defaults to 1e3
+##' @param est estimate of the object; defaults to median
+getPostEst <- function(btf, parameter = c('beta', 's2', 'lambda2', 'omega2'),
+                       burn = 1e3, est = median) {
+    parameter <- match.arg(parameter)
+    est <- match.fun(est)
+    idx <- grep(substring(parameter,1,1), varnames(btf))
+    M <- dim(btf)[1]
+    samples <- as.matrix(btf[(burn+1):M,idx])
+    apply(samples,2,est)
+}
