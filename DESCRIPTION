@@ -14,10 +14,9 @@ Description: Trend filtering, as developed by Ryan J. Tibshirani, estimates the
 License: GPL (>= 2.0)
 Depends:
     Rcpp (>= 0.11.0),
-    RcppArmadillo (>= 0.4.000.4),
     RcppEigen (>= 0.3.2.1.1),
     RcppZiggurat,
     Matrix,
     coda
-LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppZiggurat
-RcppModules: individual, ind
+LinkingTo: Rcpp, RcppEigen, RcppZiggurat
+RcppModules: ind

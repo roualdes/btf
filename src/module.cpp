@@ -9,7 +9,7 @@ using namespace Rcpp;
 typedef Eigen::SparseMatrix<double> spMat;
 
 // updater
-void upParams(ind* i) {
+void upParams(ind* i, const double& lambda2) {
 
   // beta
   // old: two solves
@@ -33,8 +33,14 @@ void upParams(ind* i) {
   i->set_beta(i->rndMVNorm(Ltinv*(Ltinv.transpose()*i->y), Ltinv, std::sqrt(i->s2)));
 
   // lambda^2
-  Vec l = i->rndGamma(1, i->nk+i->rho-1.0, 2.0/(i->o2.sum()+2*i->delta));
-  i->set_l2(l(0));
+  // did the user pre-specify lambda?
+  if (lambda2 >= 0) {
+    i->set_l2(lambda2);
+  } else {
+    Vec l = i->rndGamma(1, i->nk+i->rho-1.0, 2.0/(i->o2.sum()+2*i->delta));
+    i->set_l2(l(0));    
+  }
+
 
   // omega^2
   Vec Db = (i->D*i->beta).cwiseAbs();

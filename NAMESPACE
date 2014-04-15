@@ -1,4 +1,4 @@
-import(RcppArmadillo, RcppZiggurat, RcppEigen, Matrix)
+import(RcppEigen, RcppZiggurat, Matrix)
 importFrom(Rcpp, evalCpp)
 useDynLib(btf)
 

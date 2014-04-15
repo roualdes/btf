@@ -5,12 +5,16 @@
 ##' @param individual member of the population who's state is updated by fn
 ##' @param toCODA a function to convert state history to CODA object
 ##' @author Edward A. Roualdes
-gibbs <- function(M, fn, state, toCODA) {
+gibbs <- function(M, fn, state, toCODA, pb = TRUE) {
     chain <- vector('list', M)
-    pb <- txtProgressBar(min=1, max=M, style=3); on.exit(close(pb))
+    if (pb) {
+        bar <- txtProgressBar(min=1, max=M, style=3)
+        on.exit(close(bar))
+    }
+
     for (m in seq_len(M)) {
         chain[[m]] <- fn(state)
-        setTxtProgressBar(pb, m)
+        if (pb) setTxtProgressBar(bar, m)
     }
     toCODA(chain)
 }

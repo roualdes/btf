@@ -6,23 +6,17 @@
 ##' @param burn size of burn-in,
 ##' @param probs numeric 2-vector of probabilities with values in [0,1]
 ##' @author Edward A. Roualdes
-plot.btf <- function(x, y, chain = 1, burn = 1e3, probs = c(0.025, 0.975),
-                     est = c('median', 'mean')) {
+plot.btf <- function(x, chain = 1, burn = 1e3, probs = c(0.025, 0.975),
+                     est = median) {
     betaIdx <- grep('beta', varnames(x))
+    y <- attr(x, 'ind')$y
     n <- length(y)
     t <- seq(0, 1, length.out=n)
     M <- dim(x[,betaIdx])[1]
+    est <- match.fun(est)
     samples <- x[(burn+1):M,betaIdx]
 
-    ## colors stolen from
-    ## http://geography.uoregon.edu/datagraphics/color_scales.htm
-    cols <- c('orange1' = "#FFBF80", 'orange2' = "#FF8000",
-              'yellow1' = "#FFFF99", 'yellow2' = "#FFFF33",
-              'green1' = "#B2FF8C", 'green2' = "#33FF00",
-              'blue1' = "#A6EDFF", 'blue2' = "#1AB2FF",
-              'purple1' = "#CCBFFF", 'puple2' = "#664CFF",
-              'red1' = "#FF99BF", 'red2' = "#E61A33")
-
+    ## replace with getPostEst fn; see TODO:util.R
     q <- apply(samples, 2,
                function(x) quantile(x, probs = probs))
     e <- apply(samples, 2, est)

@@ -4,13 +4,25 @@ genDelta <- function(n, k) {
     d[seq_len(n-k-1),]
 }
 
-
-matrixClass <- function(M = 'matrix', where = 'string') {
-    cl <- class(M)
-    print(sprintf("At %s matrix has class %s", where, cl))
+##' transform state's history into CODA object
+##'
+##' @param chain list of states through history
+##' @author Edward A. Roualdes
+toCoda <- function(chain) {
+    names <- names(chain[[1]])
+    hist <- mcmc(t(simplify2array(chain)))
+    varnames(hist) <- names
+    hist
 }
 
+## colors stolen from
+## http://geography.uoregon.edu/datagraphics/color_scales.htm
+cols <- c('orange1' = "#FFBF80", 'orange2' = "#FF8000",
+          'yellow1' = "#FFFF99", 'yellow2' = "#FFFF33",
+          'green1' = "#B2FF8C", 'green2' = "#33FF00",
+          'blue1' = "#A6EDFF", 'blue2' = "#1AB2FF",
+          'purple1' = "#CCBFFF", 'puple2' = "#664CFF",
+          'red1' = "#FF99BF", 'red2' = "#E61A33")
 
-calcSigmaInv <- function(D, eta, nk) {
-    Matrix::t(D) %*% .sparseDiagonal(nk, x=eta) %*% D
-}
+## TODO write getPostEst function
+
