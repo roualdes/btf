@@ -37,10 +37,12 @@ void upParams(ind* i, const double& lambda2) {
   if (lambda2 >= 0) {
     i->set_l2(lambda2);
   } else {
+    // [lambda^2] ~ lambda^-2
     Vec l = i->rndGamma(1, i->nk+i->rho-1.0, 2.0/(i->o2.sum()+2*i->delta));
+    // uniform prior
+    // Vec l = i->rndGamma(1, i->nk+i->rho+1.0, 2.0/(i->o2.sum()+2*i->delta));
     i->set_l2(l(0));    
   }
-
 
   // omega^2
   Vec Db = (i->D*i->beta).cwiseAbs();

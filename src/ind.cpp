@@ -36,13 +36,16 @@ public:
   void set_l2(const double& val) {
     l2 = val;
   }
-  void set_o2(const Vec& val) {
+  template <typename T>
+  void set_o2(const Eigen::DenseBase<T>& val) {
     o2 = val;
   }
-  void set_beta(const Vec& val) {
+  template <typename T>
+  void set_beta(const Eigen::DenseBase<T>& val) {
     beta = val;
   }
-  void set_sigma(const Vec& val) {
+  template <typename T>
+  void set_sigma(const Eigen::DenseBase<T>& val) {
     spMat W = mkDiag(val);
     sigma = D.transpose()*W*D;
     sigma.makeCompressed();
@@ -68,20 +71,18 @@ public:
       return nu2/x;
     }
   }
-  Vec rndInvGauss(const Vec& nu_, const double& lambda_) {
+  template <typename T>
+  Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const double& lambda_) {
     Vec out(nk);
     for (int i=0; i<nk; i++) {
       out(i) = rInvGauss(nu_(i), lambda_);
     }
     return out;
   }
-  // Vec rndMVNorm(const Vec& mu_, const Eigen::MatrixXd& sqrtCov_) {
-  //   Vec Y = zrnorm(sqrtCov_.cols());
-  //   return mu_+sqrtCov_*Y;
-  // }
+  // rndMVNorm templated ? can't figure it out
   Vec rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
     return (scale*(sqrtCov_*zrnorm(sqrtCov_.cols()))+mu_).eval();
-  }
+  } 
   Vec rndGamma(const int& n_, const double& shape_, const double& rate_) {
     RNGScope scope;
     NumericVector x = rgamma(n_, shape_, rate_);
@@ -90,7 +91,8 @@ public:
   }
 
   // utility
-  spMat mkDiag(const Vec& val) {
+  template <typename T>
+  spMat mkDiag(const Eigen::DenseBase<T>& val) {
     int I = val.size();
     spMat W(I,I); W.reserve(I);
     for (int i=0; i<I; i++) {

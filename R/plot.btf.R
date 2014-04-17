@@ -7,7 +7,7 @@
 ##' @author Edward A. Roualdes
 plot.btf <- function(btf, x = c(0,1), burn = 1e3, probs = c(0.05, 0.95),
                      est = median) {
-    y <- attr(btf, 'ind')$y
+    y <- attr(btf, 'y')
     n <- length(y)
     x <- seq(x[1], x[2], length.out=n)
     est <- match.fun(est)
