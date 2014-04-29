@@ -33,21 +33,17 @@ void upParams(ind* i, const double& lambda2) {
   i->set_beta(i->rndMVNorm(Ltinv*(Ltinv.transpose()*i->y), Ltinv, std::sqrt(i->s2)));
 
   // lambda^2
-  // did the user pre-specify lambda?
-  if (lambda2 >= 0) {
+  if (lambda2 >= 0) {           // did the user pre-specify lambda?
     i->set_l2(lambda2);
   } else {
-    // [lambda^2] ~ lambda^-2
-    Vec l = i->rndGamma(1, i->nk+i->rho-1.0, 2.0/(i->o2.sum()+2*i->delta));
-    // uniform prior
-    // Vec l = i->rndGamma(1, i->nk+i->rho+1.0, 2.0/(i->o2.sum()+2*i->delta));
+    Vec l = i->rndGamma(1, i->nk+i->rho, 2.0/(i->o2.sum()+2*i->delta));
     i->set_l2(l(0));    
   }
 
   // omega^2
-  Vec Db = (i->D*i->beta).cwiseAbs();
-  Vec nu = std::sqrt(i->l2*i->s2)/Db.array();
-  Vec eta = i->rndInvGauss(nu, i->l2);
+  Vec Db = (i->D*i->beta).cwiseAbs2();
+  Vec nu = i->l2*i->s2/Db.array();
+  Vec eta = i->rndInvGauss(nu.cwiseSqrt(), i->l2);
   i->set_sigma(eta);
   i->set_o2(eta.cwiseInverse());
 

@@ -1,28 +1,33 @@
 ##' Bayesian trend filtering via Eigen
 ##'
+##' need better description of this function
+##'
 ##' @param y response vector
+##' @param x inputs corresponding to y observations
 ##' @param k degree of polynomial fit
-##' @param iters number of samples
+##' @param iters number of samples to draw from posterior
+##' @param lambda set lambda to a specified values
+##' @param rho shape parameter for prior on lambda
+##' @param delta rate parameter for prior on lambda
+##' @param pb logical indicating weather or not to show a progress bar
+##' @aliases btf
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(x=NULL, y='vector' , k='int', iters=5e3, lambda=NULL, rho=0,
-                delta=0, l2prior=c('gamma', 'ht'), pb=TRUE) {
+btf <- function(y='vector', x=NULL, k='int', iters=5e3, rho=1, delta=0, lambda=NULL, pb=TRUE) {
 
-    ## general variables
+    ## checks
     n <- length(y)
-    if (missing(x)) {
-        x <- seq_len(n)/n
-    }
-    ## D <- genDelta(n, k, x) # need to re-write this
-    D <- genDelta(n, k)
-    ## print(head(D[1,]))
-        
+    if (missing(x)) x <- seq_len(n)/n
+    nx <- length(x)
+    if (nx != n) stop("length of x and y differ.")
+    if (any(diff(x) <= 1e-8)) stop("elements of x must be unique")
+    D <- genDelta(n, k, x)
+    
     ## load module
     loadModule('ind', TRUE)
     individual <- new(ind, y, k, D, rho, delta) # init new individual
 
     ## handle lambda
-    l2prior <- match.arg(l2prior)               # doesn't yet do anything
     if (missing(lambda)) {
         f <- function(s) fn(state=s)    # lambda as parameter
     } else {

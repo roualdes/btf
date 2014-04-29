@@ -9,6 +9,8 @@ typedef Eigen::VectorXd Vec;
 typedef Eigen::SparseMatrix<double> spMat;
 static Ziggurat::Ziggurat::Ziggurat zigg;
 
+
+
 class ind {
 public:
   // constructors
@@ -64,8 +66,8 @@ public:
     double z2 = z(0)*z(0);
     double nu2 = nu_*nu_;
     double x = nu_+0.5*z2*nu2/lambda_-(0.5*nu_/lambda_)*std::sqrt(4.0*nu_*lambda_*z2+nu2*z2*z2);
-    Vec u = Vec::Random(1);
-    if ( std::fabs(u(0)) < nu_/(nu_+x) ) {
+    Vec u = rndUniform(1);
+    if ( u(0) < nu_/(nu_+x) ) {
       return x;
     } else {
       return nu2/x;
@@ -87,6 +89,12 @@ public:
     RNGScope scope;
     NumericVector x = rgamma(n_, shape_, rate_);
     Vec out(as<Vec>(x));        // convert to Eigen::VectorXd
+    return out;
+  }
+  Vec rndUniform(const int& n_) {
+    RNGScope scope;
+    NumericVector x = runif(n_);
+    Vec out(as<Vec>(x));
     return out;
   }
 

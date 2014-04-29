@@ -1,6 +1,5 @@
 \name{btf-package}
 \alias{btf-package}
-\alias{btf}
 \docType{package}
 \title{
   Estimate univariate non-parametric regression function with domain [0,1].

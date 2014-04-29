@@ -1,18 +1,29 @@
 \name{tf}
 \alias{tf}
-\title{Bayesian trend filtering}
+\title{approximate trendfiltering via MM algorithm}
 \usage{
-tf(y = "vector", k = "integer", iters = 5000)
+tf(y, x = NULL, k = 2, l, D = NULL, eps = 1e-08, tau = 1e-05,
+  max_iter = 500)
 }
 \arguments{
-  \item{y}{response vector}
+  \item{y}{observed data}
 
-  \item{k}{degree of polynomial fit}
+  \item{x}{inputs corresponding to observations}
 
-  \item{iters}{number of samples}
+  \item{k}{order of fit}
+
+  \item{l}{vector of penalty parameters lambda}
+
+  \item{D}{matrix Delta of order k+1}
+
+  \item{eps}{error adjustment to majorization function}
+
+  \item{tau}{convergence threshold}
+
+  \item{max_iter}{maximum number of iterations allowed}
 }
 \description{
-Bayesian trend filtering
+approximate trendfiltering via MM algorithm
 }
 \author{
 Edward A. Roualdes

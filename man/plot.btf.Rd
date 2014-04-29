@@ -2,20 +2,23 @@
 \alias{plot.btf}
 \title{plot btf obects}
 \usage{
-\method{plot}{btf}(x, y, chain = 1, burn = 100, probs = c(0.025, 0.975),
-  est = mean)
+\method{plot}{btf}(x, t = NULL, burn = 1000, probs = c(0.05, 0.95),
+  est = median, ...)
 }
 \arguments{
-  \item{x}{coda object that contains a btf history}
+  \item{x}{btf object}
 
-  \item{y}{response vector for btf model}
-
-  \item{chain}{number of chains included in x}
+  \item{t}{domain of function}
 
   \item{burn}{size of burn-in,}
 
   \item{probs}{numeric 2-vector of probabilities with
   values in [0,1]}
+
+  \item{est}{function specifying how draws from the
+  posterior are summarized}
+
+  \item{...}{extra arguments to be passed as methods}
 }
 \description{
 plot btf obects

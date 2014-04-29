@@ -1,9 +1,12 @@
 ##' Gibbs sampler framework
 ##'
+##' implements Gibbs iterations based on updating function fn
+##' 
 ##' @param M number of iterations
 ##' @param fn function to update parameters in-place
-##' @param individual member of the population who's state is updated by fn
+##' @param state member of the population who's state is updated by fn
 ##' @param toCODA a function to convert state history to CODA object
+##' @param pb logical indicating weather or not to show a progress bar
 ##' @author Edward A. Roualdes
 gibbs <- function(M, fn, state, toCODA, pb = TRUE) {
     chain <- vector('list', M)

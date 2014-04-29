@@ -1,4 +1,6 @@
-import(RcppEigen, RcppZiggurat, Matrix)
+import(RcppEigen, RcppZiggurat, Matrix, coda)
 importFrom(Rcpp, evalCpp)
 useDynLib(btf)
+export(btf, getPostEst, getPost, plot.btf)
+S3method("plot","btf")
 
