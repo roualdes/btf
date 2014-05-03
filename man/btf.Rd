@@ -2,8 +2,8 @@
 \alias{btf}
 \title{Bayesian trend filtering via Eigen}
 \usage{
-btf(y = "vector", x = NULL, k = "int", iters = 5000, rho = 1,
-  delta = 0, lambda = NULL, pb = TRUE)
+btf(y = "vector", x = NULL, k = "int", iter = 5000, alpha = 2,
+  rho = 0.01, lambda = NULL, pb = TRUE)
 }
 \arguments{
   \item{y}{response vector}
@@ -12,13 +12,13 @@ btf(y = "vector", x = NULL, k = "int", iters = 5000, rho = 1,
 
   \item{k}{degree of polynomial fit}
 
-  \item{iters}{number of samples to draw from posterior}
+  \item{iter}{number of samples to draw from posterior}
 
   \item{lambda}{set lambda to a specified values}
 
-  \item{rho}{shape parameter for prior on lambda}
+  \item{alpha}{shape parameter for prior on lambda}
 
-  \item{delta}{rate parameter for prior on lambda}
+  \item{rho}{rate parameter for prior on lambda}
 
   \item{pb}{logical indicating weather or not to show a
   progress bar}

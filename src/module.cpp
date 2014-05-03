@@ -3,7 +3,6 @@
 #include "ind.cpp"
 
 // [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::plugins(openmp)]]
 
 using namespace Rcpp;
 typedef Eigen::SparseMatrix<double> spMat;
@@ -36,13 +35,15 @@ void upParams(ind* i, const double& lambda2) {
   if (lambda2 >= 0) {           // did the user pre-specify lambda?
     i->set_l2(lambda2);
   } else {
-    Vec l = i->rndGamma(1, i->nk+i->rho, 2.0/(i->o2.sum()+2*i->delta));
+    Vec l = i->rndGamma(1, i->nk+i->alpha, 2.0/(i->o2.sum()+2*i->rho));
     i->set_l2(l(0));    
   }
 
   // omega^2
   Vec Db = (i->D*i->beta).cwiseAbs2();
   Vec nu = i->l2*i->s2/Db.array();
+  // try, to reduce temporaries
+  // Vec nu = (i->l2*i->s2/(i->D*i->beta).array().abs()).sqrt();
   Vec eta = i->rndInvGauss(nu.cwiseSqrt(), i->l2);
   i->set_sigma(eta);
   i->set_o2(eta.cwiseInverse());

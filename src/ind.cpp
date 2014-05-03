@@ -2,19 +2,16 @@
 #include <Ziggurat.h>
 
 // [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::plugins(openmp)]] // this alone doesn't seem to do it
 
 using namespace Rcpp;
 typedef Eigen::VectorXd Vec;
 typedef Eigen::SparseMatrix<double> spMat;
 static Ziggurat::Ziggurat::Ziggurat zigg;
 
-
-
 class ind {
 public:
   // constructors
-  ind(const Vec y_, const double k_, const spMat D_, const double rho_, const double delta_) : y(y_), k(k_), D(D_), rho(rho_), delta(delta_) {
+  ind(const Vec y_, const double k_, const spMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
 
     // general info
     n = y.size();
@@ -50,6 +47,7 @@ public:
   void set_sigma(const Eigen::DenseBase<T>& val) {
     spMat W = mkDiag(val);
     sigma = D.transpose()*W*D;
+    // try to reduce temps, sigma = D.transpose()*mkDiag(val)*D;
     sigma.makeCompressed();
   }
 
@@ -113,14 +111,14 @@ public:
   Vec y, beta, o2;
   int n, k, nk;
   spMat D, sigma;
-  double rho, delta, l2, s2;
+  double alpha, rho, l2, s2;
   Eigen::SimplicialLLT<spMat > LLt;
 
 private:
   
   // initializers
   void init_l2() {
-    Vec L = rndGamma(1, nk+rho, 1.0+delta);
+    Vec L = rndGamma(1, nk+alpha, 2.0/(1.0+rho));
     l2 = L(0);
   }
   void init_o2() {

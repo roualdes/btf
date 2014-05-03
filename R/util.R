@@ -5,7 +5,7 @@ gendelta <- function(n, k) {
 }
 
 
-##' ##' generate Matrix Delta^{k+1}
+##' generate Matrix Delta^{k+1}
 ##'
 ##' @param n sample size
 ##' @param k order of fit
@@ -69,5 +69,3 @@ getPostEst <- function(btf, parameter = c('beta', 's2', 'lambda2', 'omega2'),
     samples <- getPost(btf, parameter=match.arg(parameter), burn=burn)
     apply(as.matrix(samples),2,match.fun(est))
 }
-
-
