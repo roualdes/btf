@@ -3,64 +3,64 @@
 #include "ind.cpp"
 
 // [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins("cpp11")]]
 
-using namespace Rcpp;
-typedef Eigen::SparseMatrix<double> spMat;
-
-// updater
 void upParams(ind* i, const double& lambda2) {
 
   // beta
-  // old: two solves
-  // i->LLt.factorize(i->sigma);
-  // spMat I(i->n,i->n); I.setIdentity();
-  // spMat SigmaInv(i->n, i->n); SigmaInv = i->LLt.solve(I);
-  // Eigen::SimplicialLLT<spMat > chol; chol.compute(i->s2*SigmaInv);
-  // i->set_beta(i->rndMVNorm(SigmaInv*i->y, chol.matrixL()));
-
-  // new: one solve
   i->LLt.factorize(i->sigma);
-  // to get L^{-1}, have to deal with fill-reducing permutation matrices
-  // Eigen::MatrixXd Pinv = i->LLt.permutationPinv();
-  // Eigen::MatrixXd Ltinv = i->LLt.solve(Pinv*i->LLt.matrixL()*Pinv.transpose());
-  // some awkward casting to MatrixXds is going on; I would much prefer spMat
-
-  spMat L(i->n,i->n);
+  spMat L(i->n,i->n); spMat Ltinv(i->n,i->n);
   i->LLt.matrixL().twistedBy(i->LLt.permutationPinv()).evalTo(L);
-  spMat Ltinv(i->n,i->n);
   Ltinv = i->LLt.solve(L);
   i->set_beta(i->rndMVNorm(Ltinv*(Ltinv.transpose()*i->y), Ltinv, std::sqrt(i->s2)));
 
-  // lambda^2
-  if (lambda2 >= 0) {           // did the user pre-specify lambda?
-    i->set_l2(lambda2);
-  } else {
-    Vec l = i->rndGamma(1, i->nk+i->alpha, 2.0/(i->o2.sum()+2*i->rho));
-    i->set_l2(l(0));    
-  }
+  // s2
+  double rate = (i->y-i->beta).squaredNorm() + i->beta.transpose()*i->sigma*i->beta;
+  Vec S = i->rndGamma(1, i->n, 2.0/rate);
+  if ( std::isnan(S(0))) stop("s2 not real.");
+  i->set_s2(1.0/S(0));
 
-  // omega^2
-  Vec Db = (i->D*i->beta).cwiseAbs2();
-  Vec nu = i->l2*i->s2/Db.array();
-  // try, to reduce temporaries
-  // Vec nu = (i->l2*i->s2/(i->D*i->beta).array().abs()).sqrt();
-  Vec eta = i->rndInvGauss(nu.cwiseSqrt(), i->l2);
+  Vec eta(i->nk);
+  Vec Db = (i->D*i->beta).cwiseAbs();
+  double pnk = std::pow((double)i->n, i->k);
+  double kf = (double)i->fact(i->k);
+  if (i->cprior == 1) {         // generalized double Pareto
+
+    Vec lambda(i->nk); 
+    double a = 1+i->alpha; 
+    double sig = std::sqrt(i->s2);
+    for (int j=0; j<i->nk; j++) {
+      // maybe change this to one function call
+      Vec tmp = i->rndGamma(1, a, 1.0/((Db(j)/sig + i->rho)));
+      lambda(j) = tmp(0);
+    }
+    i->set_l(lambda);
+    eta = i->rndInvGauss(i->l.array()*sig/Db.array(),i->l.cwiseProduct(i->l));
+
+  } else {
+
+    if (lambda2 >= 0) {         // did the user pre-specify lambda?
+      i->set_l2(lambda2);
+    } else {                    // Laplacian
+
+      Vec lambda2 = i->rndGamma(1,i->nk+i->alpha, pnk*2.0/((i->o2.sum()+2*i->rho)*kf));
+      if ( std::isnan(lambda2(0)) ) stop("lambda2 not real.");
+      i->set_l2(lambda2(0));
+
+    }
+    eta = i->rndInvGauss(std::sqrt(i->l2*i->s2)/Db.array(), i->l2);  
+  }
   i->set_sigma(eta);
   i->set_o2(eta.cwiseInverse());
-
-  // s^2
-  double rate = (i->y-i->beta).squaredNorm() + i->beta.transpose()*i->sigma*i->beta;
-  Vec s = i->rndGamma(1, i->n, 2.0/rate);
-  i->set_s2(1.0/s(0));
-
 }
 
 RCPP_MODULE(ind) {
   class_<ind>( "ind" )
-    .constructor<Vec, double, spMat, double, double>()
+    .constructor<Vec, double, MspMat, int, double, double>()
     .field( "y", &ind::y)
     .field( "beta", &ind::beta)
-    .field( "o2", &ind::o2)
+    .field( "o", &ind::o2)
+    .field( "l", &ind::l)
     .field( "l2", &ind::l2)
     .field( "s2", &ind::s2)
     .field( "D", &ind::D)

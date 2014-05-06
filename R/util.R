@@ -21,7 +21,7 @@ genDelta <- function(n, k, x) {
         z <- x[idx]
         d[i,idx] <- tmp*sapply(seq_along(z),function(j) 1/prod(z[j]-z[-j]))
     }
-    gamma(k+1)/n^k * d
+    gamma(k+1)*d/n^k
 }
 
 ##' transform state's history into CODA object
@@ -50,10 +50,10 @@ cols <- c('orange1' = "#FFBF80", 'orange2' = "#FF8000",
 ##' @param parameter name of the parameter of interest
 ##' @param burn number of samples to discard
 ##' @export
-getPost <- function(btf, parameter = c('beta', 's2', 'lambda2', 'omega2'),
+getPost <- function(btf, parameter = c('beta', 's2', 'lambda', 'omega'),
                     burn = 1e3) {
     parameter <- match.arg(parameter)
-    idx <- grep(substring(parameter,1,1), varnames(btf))
+    idx <- grep(parameter, varnames(btf))
     window(btf[,idx], start=burn)
 }
 
@@ -64,7 +64,7 @@ getPost <- function(btf, parameter = c('beta', 's2', 'lambda2', 'omega2'),
 ##' @param burn number of samples to discard
 ##' @param est estimate of the object
 ##' @export
-getPostEst <- function(btf, parameter = c('beta', 's2', 'lambda2', 'omega2'),
+getPostEst <- function(btf, parameter = c('beta', 's2', 'lambda', 'omega'),
                        burn = 1e3, est = median) {
     samples <- getPost(btf, parameter=match.arg(parameter), burn=burn)
     apply(as.matrix(samples),2,match.fun(est))

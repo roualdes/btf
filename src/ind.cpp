@@ -2,23 +2,25 @@
 #include <Ziggurat.h>
 
 // [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins("cpp11")]]
 
 using namespace Rcpp;
-typedef Eigen::VectorXd Vec;
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vec;
+typedef Eigen::MappedSparseMatrix<double> MspMat;
 typedef Eigen::SparseMatrix<double> spMat;
 static Ziggurat::Ziggurat::Ziggurat zigg;
 
 class ind {
 public:
-  // constructors
-  ind(const Vec y_, const double k_, const spMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
+  // constructor
+  ind(const Vec y_, const int k_, const  MspMat D_, const double alpha_, const double rho_, const int cprior_) : y(y_), k(k_), D(D_), cprior(cprior_), alpha(alpha_), rho(rho_) {
 
     // general info
     n = y.size();
     nk = n-k-1;
 
     // initialize
-    init_l2();
+    if (cprior == 1) init_l(); else init_l2(); // which conditional prior
     init_o2();
     init_s2();
     init_beta();
@@ -36,6 +38,10 @@ public:
     l2 = val;
   }
   template <typename T>
+  void set_l(const Eigen::DenseBase<T>& val) {
+    l = val;
+  }
+  template <typename T>
   void set_o2(const Eigen::DenseBase<T>& val) {
     o2 = val;
   }
@@ -45,9 +51,7 @@ public:
   }
   template <typename T>
   void set_sigma(const Eigen::DenseBase<T>& val) {
-    spMat W = mkDiag(val);
-    sigma = D.transpose()*W*D;
-    // try to reduce temps, sigma = D.transpose()*mkDiag(val)*D;
+    sigma = D.transpose()*mkDiag(val)*D;
     sigma.makeCompressed();
   }
 
@@ -60,6 +64,9 @@ public:
     return x;
   } 
   double rInvGauss(const double& nu_, const double& lambda_) {
+    if (std::isnan(nu_) || std::isnan(lambda_)) {
+      stop("rInvGauss: Invalid parameters.");
+    }
     Vec z = zrnorm(1);          // one N(0,1)
     double z2 = z(0)*z(0);
     double nu2 = nu_*nu_;
@@ -76,6 +83,15 @@ public:
     Vec out(nk);
     for (int i=0; i<nk; i++) {
       out(i) = rInvGauss(nu_(i), lambda_);
+      if ( std::isnan(out(i)) ) stop("rndInvGauss: Invalid output.");
+    }
+    return out;
+  }
+  template <typename T, typename S>
+  Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const Eigen::DenseBase<S>& lambda_) {
+    Vec out(nk);
+    for (int i=0; i<nk; i++) {
+      out(i) = rInvGauss(nu_(i), lambda_(i));
     }
     return out;
   }
@@ -83,9 +99,12 @@ public:
   Vec rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
     return (scale*(sqrtCov_*zrnorm(sqrtCov_.cols()))+mu_).eval();
   } 
-  Vec rndGamma(const int& n_, const double& shape_, const double& rate_) {
+  Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
+    if ( std::isnan(shape_) || std::isnan(scale_) ) {
+      stop("rndGamma: Invalid parameters.");
+    }
     RNGScope scope;
-    NumericVector x = rgamma(n_, shape_, rate_);
+    NumericVector x = rgamma(n_, shape_, scale_);
     Vec out(as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
   }
@@ -107,10 +126,17 @@ public:
     return W;
   }
 
+  int fact(const int& k_) {
+    int out=1;
+    for (int i=k_; i>1; i--) out *= i;
+    return out;
+  }
+
   // fields
-  Vec y, beta, o2;
+  Vec y, beta, o2, l;
   int n, k, nk;
   spMat D, sigma;
+  int cprior;
   double alpha, rho, l2, s2;
   Eigen::SimplicialLLT<spMat > LLt;
 
@@ -120,6 +146,10 @@ private:
   void init_l2() {
     Vec L = rndGamma(1, nk+alpha, 2.0/(1.0+rho));
     l2 = L(0);
+  }
+  void init_l() {
+    Vec L = rndGamma(nk, nk+alpha, 1.0/(1.0+rho));
+    l = L;
   }
   void init_o2() {
     Vec O = rndGamma(nk, 1.0, 2.0);

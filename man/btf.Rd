@@ -2,8 +2,9 @@
 \alias{btf}
 \title{Bayesian trend filtering via Eigen}
 \usage{
-btf(y = "vector", x = NULL, k = "int", iter = 5000, alpha = 2,
-  rho = 0.01, lambda = NULL, pb = TRUE)
+btf(y = "vector", x = NULL, k = "int", iter = 5000,
+  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL,
+  lambda = NULL, pb = FALSE)
 }
 \arguments{
   \item{y}{response vector}
@@ -13,6 +14,9 @@ btf(y = "vector", x = NULL, k = "int", iter = 5000, alpha = 2,
   \item{k}{degree of polynomial fit}
 
   \item{iter}{number of samples to draw from posterior}
+
+  \item{cond.prior}{choose the conditional prior on
+  f|sigma}
 
   \item{lambda}{set lambda to a specified values}
 
