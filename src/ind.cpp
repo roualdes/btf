@@ -1,5 +1,4 @@
 #include <RcppEigen.h>
-#include <Ziggurat.h>
 
 // [[Rcpp::plugins("cpp11")]]
 
@@ -7,7 +6,6 @@ using namespace Rcpp;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vec;
 typedef Eigen::MappedSparseMatrix<double> MspMat;
 typedef Eigen::SparseMatrix<double> spMat;
-static Ziggurat::Ziggurat::Ziggurat zigg;
 
 class ind {
 public:
@@ -55,18 +53,17 @@ public:
   }
 
   // random
-  Vec zrnorm(int n) {
-    Vec x(n);
-    for(int i=0; i<n; i++) {
-      x(i) = zigg.norm();
-    }
-    return x;
+  Vec rndNorm(const int& n_) {
+    RNGScope scope;
+    NumericVector x = rnorm(n_);
+    Vec out(as<Vec>(x));
+    return out;
   } 
   double rInvGauss(const double& nu_, const double& lambda_) {
     if (std::isnan(nu_) || std::isnan(lambda_)) {
       stop("rInvGauss: Invalid parameters.");
     }
-    Vec z = zrnorm(1);          // one N(0,1)
+    Vec z = rndNorm(1);          // one N(0,1)
     double z2 = z(0)*z(0);
     double nu2 = nu_*nu_;
     double x = nu_+0.5*z2*nu2/lambda_-(0.5*nu_/lambda_)*std::sqrt(4.0*nu_*lambda_*z2+nu2*z2*z2);
@@ -96,7 +93,7 @@ public:
   }
   // rndMVNorm templated ? can't figure it out
   Vec rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
-    return (scale*(sqrtCov_*zrnorm(sqrtCov_.cols()))+mu_).eval();
+    return (scale*(sqrtCov_*rndNorm(sqrtCov_.cols()))+mu_).eval();
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     if ( std::isnan(shape_) || std::isnan(scale_) ) {

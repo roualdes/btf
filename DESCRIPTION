@@ -15,9 +15,8 @@ License: GPL (>= 2.0)
 Depends:
     Rcpp (>= 0.11.0),
     RcppEigen (>= 0.3.2.1.1),
-    RcppZiggurat,
     Matrix,
     coda
-LinkingTo: Rcpp, RcppEigen, RcppZiggurat
+LinkingTo: Rcpp, RcppEigen
 RcppModules: ind
 NeedsCompilation: yes
