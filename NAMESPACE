@@ -1,4 +1,4 @@
-import(RcppEigen, RcppZiggurat, Matrix, coda)
+import(RcppEigen, Matrix, coda)
 importFrom(Rcpp, evalCpp)
 useDynLib(btf)
 export(btf, getPostEst, getPost, plot.btf)
