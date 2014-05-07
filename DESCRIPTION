@@ -20,3 +20,4 @@ Depends:
     coda
 LinkingTo: Rcpp, RcppEigen, RcppZiggurat
 RcppModules: ind
+NeedsCompilation: yes

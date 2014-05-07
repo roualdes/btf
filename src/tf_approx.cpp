@@ -1,8 +1,5 @@
 #include <RcppEigen.h>
 
-// [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::plugins(openmp)]] // this alone doesn't seem to do it
-
 using namespace Rcpp;
 typedef Eigen::VectorXd Vec;
 typedef Eigen::SparseMatrix<double> spMat;
@@ -17,12 +14,10 @@ spMat mkDiag(const Eigen::DenseBase<T>& val) {
   return W;
 }
 
-// [[Rcpp::export]]
 
-using namespace Rcpp;
+// [[Rcpp::export]]
 typedef Eigen::VectorXd Vec;
 typedef Eigen::SparseMatrix<double> spMat;
-
 List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, 
                const double& eps, const double& tau, const int& max_iter) {
   // author Edward A. Roualdes
@@ -41,8 +36,6 @@ List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k,
   LLt.analyzePattern(D.transpose()*W*D); // symbolic decomposition on the sparcity
   LLt.setShift(1.0, 1.0);                // add Identity
   Vec iter_out(J);              // store number iterations per lambda
-  
-
 
   // for each lambda
   for (int j=0; j<J; j++) {

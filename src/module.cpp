@@ -1,8 +1,5 @@
-#include <RcppEigen.h>
-#include <Ziggurat.h>
 #include "ind.cpp"
 
-// [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::plugins("cpp11")]]
 
 void upParams(ind* i, const double& lambda2) {

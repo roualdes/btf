@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // tf_approx
-using namespace Rcpp; typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat;  List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, const double& eps, const double& tau, const int& max_iter);
+typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat; List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, const double& eps, const double& tau, const int& max_iter);
 RcppExport SEXP btf_tf_approx(SEXP ySEXP, SEXP lSEXP, SEXP DSEXP, SEXP kSEXP, SEXP epsSEXP, SEXP tauSEXP, SEXP max_iterSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -20,7 +20,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP );
         Rcpp::traits::input_parameter< const double& >::type tau(tauSEXP );
         Rcpp::traits::input_parameter< const int& >::type max_iter(max_iterSEXP );
-        using namespace Rcpp; typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat;  List __result = tf_approx(y, l, D, k, eps, tau, max_iter);
+        typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat; List __result = tf_approx(y, l, D, k, eps, tau, max_iter);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
