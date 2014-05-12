@@ -19,8 +19,7 @@ void upParams(ind* i, const double& lambda2) {
 
   Vec eta(i->nk);
   Vec Db = (i->D*i->beta).cwiseAbs();
-  double pnk = std::pow((double)i->n, i->k);
-  double kf = (double)i->fact(i->k);
+  double pnk = std::pow((double)i->n, 2*i->k);
   if (i->cprior == 1) {         // generalized double Pareto
 
     Vec lambda(i->nk); 
@@ -40,7 +39,7 @@ void upParams(ind* i, const double& lambda2) {
       i->set_l2(lambda2);
     } else {                    // Laplacian
 
-      Vec lambda2 = i->rndGamma(1,i->nk+i->alpha, pnk*2.0/((i->o2.sum()+2*i->rho)*kf));
+      Vec lambda2 = i->rndGamma(1,i->nk+i->alpha, 2.0/(i->o2.sum()+2*i->rho/pnk));
       if ( std::isnan(lambda2(0)) ) stop("lambda2 not real.");
       i->set_l2(lambda2(0));
 

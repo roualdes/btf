@@ -37,7 +37,6 @@ btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp
     } else stop("specified value of cond.prior not understood.")
     print(paste('alpha = ', alpha))
     print(paste('rho = ', rho))
-    print(cprior)
     
     ## load module
     loadModule('ind', TRUE)

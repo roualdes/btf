@@ -79,7 +79,10 @@ public:
     Vec out(nk);
     for (int i=0; i<nk; i++) {
       out(i) = rInvGauss(nu_(i), lambda_);
-      if ( std::isnan(out(i)) ) stop("rndInvGauss: Invalid output.");
+      if ( std::isnan(out(i)) ) {
+        Rcout << "nu = " <<  nu_(i) << " and lambda = " << lambda_ << std::endl;
+        stop("rndInvGauss: Invalid output.");
+      }
     }
     return out;
   }
@@ -97,6 +100,7 @@ public:
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     if ( std::isnan(shape_) || std::isnan(scale_) ) {
+      Rcout << "shape = " << shape_ << " and scale = " << scale_ << std::endl;
       stop("rndGamma: Invalid parameters.");
     }
     RNGScope scope;
@@ -121,12 +125,11 @@ public:
     }
     return W;
   }
-
   int fact(const int& k_) {
     int out=1;
     for (int i=k_; i>1; i--) out *= i;
     return out;
-  }
+  } // can prob do without
 
   // fields
   Vec y, beta, o2, l;
