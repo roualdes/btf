@@ -12,7 +12,7 @@
 ##' @aliases btf
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL) {
+btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdP', 'dexp'), alpha=NULL, rho=NULL) {
 
     ## checks
     n <- length(y)
@@ -24,26 +24,40 @@ btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp
 
     ## conditional prior and hyper-parameters
     cond.prior <- match.arg(cond.prior)
-    if (cond.prior == 'gdp') {
+    if (tolower(cond.prior) == 'gdp') {
+        ## more specific checks
         if (!missing(alpha)) alpha <- alpha else alpha <- 1
         if (!missing(rho)) rho <- rho else rho <- 1
+        str <- sprintf('generalized double Pareto conditional prior with alpha = %f and rho = %f',
+                       alpha, rho)
+        print(str)
+        ## run sampler
         stop ('do something with me.')
-    } else if (cond.prior == 'dexp') {
+        
+    } else if (tolower(cond.prior) == 'dexp') {
+
+        ## more specific checks
         if (!missing(alpha)) alpha <- alpha else alpha <- 1
         if (!missing(rho)) rho <- rho else rho <- 0
+        str <- sprintf('double exponential conditional prior with alpha = %f and rho = %f',
+                       alpha, rho)
+        print(str)
 
+        ## run sampler
         chain <- dexpBTF(iter, y, k, D, alpha, rho)
+
+        ## tidying
         chain <- as.mcmc(chain)
         varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
                              's2', 'lambda',
                              paste('omega', seq_len(n-k-1), sep=''))
-        str <- sprintf('double exponential conditional prior with alpha = %f and rho = %f',
-                       alpha, rho)
-        print(str)
+
         
     } else {
         stop("specified value of cond.prior not understood.")
     }
+
+    ## append some shit for printing
     attr(chain, 'y') <- y
     attr(chain, 'x') <- x
     class(chain) <- c('btf', class(chain))

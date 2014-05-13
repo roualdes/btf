@@ -3,7 +3,7 @@
 \title{Bayesian trend filtering via Eigen}
 \usage{
 btf(y = "vector", x = NULL, k = "int", iter = 5000,
-  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL)
+  cond.prior = c("gdP", "dexp"), alpha = NULL, rho = NULL)
 }
 \arguments{
   \item{y}{response vector}

@@ -3,6 +3,6 @@ import(RcppEigen, coda)
 importFrom(Matrix, Matrix)
 importFrom(Matrix, bandSparse)
 importFrom(Rcpp, evalCpp)
-export(btf, getPostEst, getPost, plot.btf)
+export(btf, getPostEst, getPost, plot.btf, tf)
 S3method("plot","btf")
 

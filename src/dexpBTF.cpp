@@ -18,6 +18,12 @@ Eigen::MatrixXd dexpBTF(const int& iter,
     btf->upS2();
     btf->upOmega2Lambda2();
     history.row(i) << btf->beta.transpose(), btf->s2, btf->l2, btf->o2.transpose();
+    for (int j=0; j<P; ++j) {
+      if ( std::isnan(history(i,j)) ) {
+        Rcpp::Rcout << history.row(i-1) << std::endl;
+        Rcpp::stop("some nans.");
+      }
+    }
   }
   return history;
 }
