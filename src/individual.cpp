@@ -137,30 +137,33 @@ class individual {
     Vec S = rndGamma(1, n, 2.0/rate);
     s2 = 1.0/S(0);
   }
-  void upOmega2Lambda2() {
-    Vec eta(nk);
-    Vec Db = (D*beta).cwiseAbs();
-    double pnk = std::pow((double)n, 2*k);
-
-    // lambda2
-    Vec lambda2 = rndGamma(1,nk+alpha, 2.0/(o2.sum()+2*rho/pnk));
-    l2 = lambda2(0);
-
-    // omega2
-    eta = rndInvGauss(std::sqrt(l2*s2)/Db.array(), l2);
+  void upOmega2() {
+    Vec eta = rndInvGauss(std::sqrt(l2*s2)/(D*beta).cwiseAbs().array(), l2);
     o2 = eta.cwiseInverse();
 
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
     sigma.makeCompressed();
   }
-  void upOmegaLambda() {
-    Vec eta(nk);
-    Vec Db = (D*beta).cwiseAbs();
-    // double pnk = std::pow((double)n, 2*k);
 
-    // lambda
+  void upLambda2() {
+    double pnk = std::pow((double)n, 2*k);
+    Vec lambda2 = rndGamma(1,nk+alpha, 2.0/(o2.sum()+2*rho/pnk));
+    l2 = lambda2(0);
+    
+  }
+  void upOmega() {
+    Vec eta = rndInvGauss(l.array()*std::sqrt(s2)/(D*beta).cwiseAbs().array(),l.cwiseProduct(l));
+    o2 = eta.cwiseInverse();
+    
+    // update sigma_f
+    sigma = D.transpose()*mkDiag(eta)*D;
+    sigma.makeCompressed();    
+  }
+  void upLambda() {
     Vec lambda(nk); 
+    // double pnk = std::pow((double)n, 2*k);
+    Vec Db = (D*beta).cwiseAbs();
     double a = 1+alpha; 
     double sig = std::sqrt(s2);
     for (int j=0; j<nk; j++) {
@@ -168,14 +171,6 @@ class individual {
       Vec tmp = rndGamma(1, a, 1.0/((Db(j)/sig + rho)));
       lambda(j) = tmp(0);
     }
-    l = lambda;
-
-    // omega
-    eta = rndInvGauss(l.array()*sig/Db.array(),l.cwiseProduct(l));
-    o2 = eta.cwiseInverse();
-    
-    // update sigma_f
-    sigma = D.transpose()*mkDiag(eta)*D;
-    sigma.makeCompressed();    
+    l = lambda;    
   }
 };

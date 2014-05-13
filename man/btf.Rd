@@ -2,7 +2,7 @@
 \alias{btf}
 \title{Bayesian trend filtering via Eigen}
 \usage{
-btf(y = "vector", x = NULL, k = "int", iter = 5000,
+btf(y = "vector", x = NULL, k = "int", iter = 10000,
   cond.prior = c("gdP", "dexp"), alpha = NULL, rho = NULL)
 }
 \arguments{

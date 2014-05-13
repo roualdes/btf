@@ -16,7 +16,8 @@ Eigen::MatrixXd dexpBTF(const int& iter,
   for (int i=0; i<iter; ++i) {
     btf->upBeta();
     btf->upS2();
-    btf->upOmega2Lambda2();
+    btf->upOmega2();
+    btf->upLambda2();
     history.row(i) << btf->beta.transpose(), btf->s2, btf->l2, btf->o2.transpose();
     for (int j=0; j<P; ++j) {
       if ( std::isnan(history(i,j)) ) {

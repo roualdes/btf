@@ -12,7 +12,7 @@
 ##' @aliases btf
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdP', 'dexp'), alpha=NULL, rho=NULL) {
+btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdP', 'dexp'), alpha=NULL, rho=NULL) {
 
     ## checks
     n <- length(y)
