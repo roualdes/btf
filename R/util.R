@@ -1,14 +1,3 @@
-##' transform state's history into CODA object
-##'
-##' @param chain list of states through history
-##' @author Edward A. Roualdes
-toCoda <- function(chain) {
-    names <- names(chain[[1]])
-    hist <- mcmc(t(simplify2array(chain)))
-    varnames(hist) <- names
-    hist
-}
-
 ## colors stolen from
 ## http://geography.uoregon.edu/datagraphics/color_scales.htm
 cols <- c('orange1' = "#FFBF80", 'orange2' = "#FF8000",

@@ -3,8 +3,7 @@
 \title{Bayesian trend filtering via Eigen}
 \usage{
 btf(y = "vector", x = NULL, k = "int", iter = 5000,
-  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL,
-  lambda = NULL, pb = FALSE)
+  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL)
 }
 \arguments{
   \item{y}{response vector}
@@ -18,14 +17,9 @@ btf(y = "vector", x = NULL, k = "int", iter = 5000,
   \item{cond.prior}{choose the conditional prior on
   f|sigma}
 
-  \item{lambda}{set lambda to a specified values}
-
   \item{alpha}{shape parameter for prior on lambda}
 
   \item{rho}{rate parameter for prior on lambda}
-
-  \item{pb}{logical indicating weather or not to show a
-  progress bar}
 }
 \description{
 need better description of this function

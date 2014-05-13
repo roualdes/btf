@@ -7,14 +7,12 @@
 ##' @param k degree of polynomial fit
 ##' @param iter number of samples to draw from posterior
 ##' @param cond.prior choose the conditional prior on f|sigma
-##' @param lambda set lambda to a specified values
 ##' @param alpha shape parameter for prior on lambda
 ##' @param rho rate parameter for prior on lambda
-##' @param pb logical indicating weather or not to show a progress bar
 ##' @aliases btf
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, lambda=NULL, pb=FALSE) {
+btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL) {
 
     ## checks
     n <- length(y)
@@ -29,41 +27,25 @@ btf <- function(y='vector', x=NULL, k='int', iter=5e3, cond.prior=c('gdp', 'dexp
     if (cond.prior == 'gdp') {
         if (!missing(alpha)) alpha <- alpha else alpha <- 1
         if (!missing(rho)) rho <- rho else rho <- 1
-        cprior <- 1
+        stop ('do something with me.')
     } else if (cond.prior == 'dexp') {
         if (!missing(alpha)) alpha <- alpha else alpha <- 1
         if (!missing(rho)) rho <- rho else rho <- 0
-        cprior <- 2
-    } else stop("specified value of cond.prior not understood.")
-    print(paste('alpha = ', alpha))
-    print(paste('rho = ', rho))
-    
-    ## load module
-    loadModule('ind', TRUE)
-    individual <- new(ind, y, k, D, cprior, alpha, rho) # init new individual
 
-    ## handle lambda
-    if (missing(lambda)) {
-        f <- function(s) upParams(state=s)    # lambda as parameter
+        chain <- dexpBTF(iter, y, k, D, alpha, rho)
+        chain <- as.mcmc(chain)
+        varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
+                             's2', 'lambda',
+                             paste('omega', seq_len(n-k-1), sep=''))
+        str <- sprintf('double exponential conditional prior with alpha = %f and rho = %f',
+                       alpha, rho)
+        print(str)
+        
     } else {
-        if (lambda < 0) {
-            print('lambda must be positive; btf will treat lambda as a parameter.')
-            f <- function(s) upParams(state=s)
-        } else {
-            f <- function(s) upParams(state=s, fixLambda=lambda*lambda) # lambda in model squared
-        }
+        stop("specified value of cond.prior not understood.")
     }
-
-    ## run chains
-    chain <- gibbs(iter, f, individual, toCoda, pb=pb)
     attr(chain, 'y') <- y
     attr(chain, 'x') <- x
     class(chain) <- c('btf', class(chain))
     chain
-}
-
-upParams <- function(state, fixLambda=-1.0) {
-    state$upParams(fixLambda)
-    c('beta' = state$beta, 's2' = state$s2,
-      'lambda' = state$l, 'lambda2' = state$l2, 'omega' = state$o)
 }
