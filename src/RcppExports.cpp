@@ -26,6 +26,26 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// gdPBTF
+Eigen::MatrixXd gdPBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const int& k, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho);
+RcppExport SEXP btf_gdPBTF(SEXP iterSEXP, SEXP ySEXP, SEXP kSEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP );
+        Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP );
+        Rcpp::traits::input_parameter< const int& >::type k(kSEXP );
+        Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP );
+        Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP );
+        Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP );
+        Eigen::MatrixXd __result = gdPBTF(iter, y, k, D, alpha, rho);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // tf_approx
 typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat; List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, const double& eps, const double& tau, const int& max_iter);
 RcppExport SEXP btf_tf_approx(SEXP ySEXP, SEXP lSEXP, SEXP DSEXP, SEXP kSEXP, SEXP epsSEXP, SEXP tauSEXP, SEXP max_iterSEXP) {

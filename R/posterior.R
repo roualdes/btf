@@ -4,7 +4,7 @@
 ##' @param parameter name of the parameter of interest
 ##' @param burn number of samples to discard
 ##' @export
-getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega'),
+getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha'),
                     burn=1e3) {
     parameter <- match.arg(parameter)
     idx <- grep(parameter, varnames(btf))
@@ -18,7 +18,7 @@ getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega'),
 ##' @param burn number of samples to discard
 ##' @param est estimate of the object
 ##' @export
-getPostEst <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega'),
+getPostEst <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha'),
                        burn=1e3, est=mean) {
     samples <- getPost(btf, parameter=match.arg(parameter), burn=burn)
     apply(as.matrix(samples),2,match.fun(est))

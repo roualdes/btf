@@ -5,6 +5,10 @@ dexpBTF <- function(iter, y, k, D, alpha, rho) {
     .Call('btf_dexpBTF', PACKAGE = 'btf', iter, y, k, D, alpha, rho)
 }
 
+gdPBTF <- function(iter, y, k, D, alpha, rho) {
+    .Call('btf_gdPBTF', PACKAGE = 'btf', iter, y, k, D, alpha, rho)
+}
+
 tf_approx <- function(y, l, D, k, eps, tau, max_iter) {
     .Call('btf_tf_approx', PACKAGE = 'btf', y, l, D, k, eps, tau, max_iter)
 }

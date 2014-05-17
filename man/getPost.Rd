@@ -2,7 +2,8 @@
 \alias{getPost}
 \title{extract posterior samples from btf object}
 \usage{
-getPost(btf, parameter = c("beta", "s2", "lambda", "omega"), burn = 1000)
+getPost(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
+  burn = 1000)
 }
 \arguments{
   \item{btf}{object}

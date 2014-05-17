@@ -12,50 +12,42 @@
 ##' @aliases btf
 ##' @author Edward A. Roualdes
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdP', 'dexp'), alpha=NULL, rho=NULL) {
+btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL) {
 
     ## checks
     n <- length(y)
-    if (missing(x)) x <- seq_len(n)/n
+    if ( missing(x) ) x <- seq_len(n)/n
     nx <- length(x)
-    if (nx != n) stop("length of x and y differ.")
-    if (any(diff(x) <= 1e-8)) stop("elements of x must be unique.")
+    if ( nx != n ) stop("length of x and y differ.")
+    if ( any(diff(x) <= 1e-8) ) stop("elements of x must be unique.")
+
     D <- genDelta(n, k, x)
-
-    ## conditional prior and hyper-parameters
+    
+    ## which conditional prior?
     cond.prior <- match.arg(cond.prior)
-    if (tolower(cond.prior) == 'gdp') {
-        ## more specific checks
-        if (!missing(alpha)) alpha <- alpha else alpha <- 1
-        if (!missing(rho)) rho <- rho else rho <- 1
-        str <- sprintf('generalized double Pareto conditional prior with alpha = %f and rho = %f',
-                       alpha, rho)
-        print(str)
-        ## run sampler
-        stop ('do something with me.')
+    if ( cond.prior == 'gdp' ) {
+        if ( missing(alpha) ) alpha <- -1.0 else alpha <- alpha  
+        if ( missing(rho) ) rho <- 0.01 else rho <- rho
         
-    } else if (tolower(cond.prior) == 'dexp') {
+        ## run sampler
+        chain <- gdPBTF(iter, y, k, D, alpha, rho)
 
-        ## more specific checks
-        if (!missing(alpha)) alpha <- alpha else alpha <- 1
-        if (!missing(rho)) rho <- rho else rho <- 0
-        str <- sprintf('double exponential conditional prior with alpha = %f and rho = %f',
-                       alpha, rho)
-        print(str)
+    } else if ( cond.prior == 'dexp' ) {
+        if ( missing(alpha) ) alpha <- 1 else alpha <- alpha
+        if ( missing(rho) ) rho <- 1e-4 else rho <- rho
 
         ## run sampler
         chain <- dexpBTF(iter, y, k, D, alpha, rho)
 
-        ## tidying
-        chain <- as.mcmc(chain)
-        varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
-                             's2', 'lambda',
-                             paste('omega', seq_len(n-k-1), sep=''))
-
-        
     } else {
         stop("specified value of cond.prior not understood.")
     }
+
+    ## tidying
+    chain <- as.mcmc(chain)
+    varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
+                         's2', 'lambda',
+                         paste('omega', seq_len(n-k-1), sep=''), 'alpha')
 
     ## append some shit for printing
     attr(chain, 'y') <- y

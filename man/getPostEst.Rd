@@ -2,8 +2,8 @@
 \alias{getPostEst}
 \title{get posterior estimates from btf object}
 \usage{
-getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega"), burn = 1000,
-  est = mean)
+getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
+  burn = 1000, est = mean)
 }
 \arguments{
   \item{btf}{btf object}
