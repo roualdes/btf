@@ -8,8 +8,6 @@ Eigen::MatrixXd gdPBTF(const int& iter,
                         const int& k, const Eigen::MappedSparseMatrix<double>& D, 
                         const double& alpha, const double& rho) {
 
-  int s = 0;
-  int tmp = 0;
   // initialize btf object
   individual *btf; double a;
   if ( alpha < 0.0 ) a = 1.0; else a = alpha;
@@ -30,15 +28,9 @@ Eigen::MatrixXd gdPBTF(const int& iter,
 
     for (int j=0; j<P; ++j) {
       if ( std::isnan(history(i,j)) ) {
-        s = 1;
+        Rcpp::Rcout << "whatch out gdp!" << std::endl;
+        return history;
       }
-    }
-    if (s == 1) {
-      Rcpp::Rcout << "stopped at iteration " << i << std::endl;
-      tmp = i-1;
-      Rcpp::Rcout << history.row(tmp) << std::endl;
-      Rcpp::Rcout << history.row(i) << std::endl;
-      Rcpp::stop("some nans.");      
     }
   }
   return history;

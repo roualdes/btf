@@ -25,9 +25,8 @@ Eigen::MatrixXd dexpBTF(const int& iter,
 
     for (int j=0; j<P; ++j) {
       if ( std::isnan(history(i,j)) ) {
-        Rcpp::Rcout << "stopped on iteration " << i <<
-          " at parameter index " << j << " with value " << 
-          history(i,j) << std::endl;
+        Rcpp::Rcout << "whatch out dexp!" << std::endl;
+        return history;
       }
     }
   }
