@@ -10,6 +10,7 @@ typedef Eigen::SparseMatrix<double> spMat;
 class individual {
  private:
   /* fields */
+  const int max_draws = 25;
   MVec y;
   int k;
   MspMat D;
@@ -24,10 +25,10 @@ class individual {
     return out;
   } 
   double rInvGauss(const double& nu_, const double& lambda_) {
-    Vec z = rndNorm(1);          // one N(0,1)
+    Vec z = rndNorm(1);         // one N(0,1)
     double z2 = z(0)*z(0);
     double nu2 = nu_*nu_;
-    double x = nu_+0.5*z2*nu2/lambda_-(0.5*nu_/lambda_)*std::sqrt(4.0*nu_*lambda_*z2+nu2*z2*z2);
+    double x = nu_+0.5*z2*(nu2/lambda_)-(0.5*(nu_/lambda_))*std::sqrt(4.0*nu_*lambda_*z2+nu2*z2*z2);
     Vec u = rndUniform(1);
     if ( u(0) < nu_/(nu_+x) ) {
       return x;
@@ -37,17 +38,27 @@ class individual {
   }
   template <typename T>
   Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const double& lambda_) {
-    Vec out(nk);
+    Vec out(nk); int draws;
     for (int i=0; i<nk; i++) {
-      out(i) = rInvGauss(nu_(i), lambda_);
+      draws = 0;
+      do {
+        out(i) = rInvGauss(nu_(i), lambda_);        
+        ++draws;
+      } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
+      if (draws > 1) Rcpp::Rcout << draws << std::endl;
     }
     return out;
   }
   template <typename T, typename S>
   Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const Eigen::DenseBase<S>& lambda_) {
-    Vec out(nk);
+    Vec out(nk); int draws;
     for (int i=0; i<nk; i++) {
-      out(i) = rInvGauss(nu_(i), lambda_(i));
+      draws = 0;
+      do {
+        out(i) = rInvGauss(nu_(i), lambda_(i));
+        ++draws;
+      } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
+      if (draws > 1) Rcpp::Rcout << draws << std::endl;
     }
     return out;
   }
@@ -56,17 +67,27 @@ class individual {
     return (scale*(sqrtCov_*rndNorm(sqrtCov_.cols()))+mu_).eval();
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
-    Rcpp::RNGScope scope;
-    Rcpp::NumericVector x = Rcpp::rgamma(n_, shape_, scale_);
+    Rcpp::RNGScope scope; Rcpp::NumericVector x;
+    int draws = 0; bool one; bool two;
+    do {
+      x = Rcpp::rgamma(n_, shape_, scale_);
+      ++draws;
+      one = Rcpp::is_true(Rcpp::any(x < 1e-13));
+      two = Rcpp::is_true(Rcpp::any(x > 1e13));
+    } while ( (one || two) && draws < max_draws);
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
   }
   template <typename T>
   Vec rndGamma(const double& shape_, const Eigen::DenseBase<T>& scale_) {
-    Rcpp::NumericVector x(nk);
-    Rcpp::RNGScope scope;
+    Rcpp::NumericVector x(nk); int draws;
+    Rcpp::RNGScope scope; Rcpp::NumericVector tmp;
     for (int i=0; i<nk; ++i) {
-      Rcpp::NumericVector tmp = Rcpp::rgamma(1, shape_, scale_(i));
+      draws = 0;
+      do {
+        tmp = Rcpp::rgamma(1, shape_, scale_(i));
+        ++draws;
+      } while ( (tmp(0) < 1e-13 || tmp(0) > 1e13) && draws < max_draws);
       x(i) = tmp(0);
     }
     Vec out(Rcpp::as<Vec>(x)); // convert to Eigen::VectorXd
@@ -177,7 +198,7 @@ class individual {
     sigma.makeCompressed();
   }
   void upLambda2() {
-    Vec lambda2 = rndGamma(1,nk+alpha, 2.0/(o2.sum()+2*rho));
+    Vec lambda2 = rndGamma(1, nk+alpha, 2.0/(o2.sum()+2*rho));
     l2 = lambda2(0);
   }
 
