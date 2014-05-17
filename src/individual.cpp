@@ -10,9 +10,8 @@ typedef Eigen::SparseMatrix<double> spMat;
 class individual {
  private:
   /* fields */
-  const int max_draws = 25;
   MVec y;
-  int k;
+  int k, max_draws;
   MspMat D;
   spMat sigma;
   Eigen::SimplicialLLT<spMat > LLt;
@@ -160,6 +159,7 @@ class individual {
   individual(const MVec y_, const int k_, const  MspMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
 
     // general info
+    max_draws = 25;
     n = y.size();
     nk = n-k-1;
 
