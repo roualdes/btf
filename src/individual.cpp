@@ -40,14 +40,15 @@ class individual {
     Vec out(nk); int draws;
     for (int i=0; i<nk; i++) {
       draws = 0;
-      do {
+      // do {
         out(i) = rInvGauss(nu_(i), lambda_);        
         ++draws;
-      } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
-      if (draws > 1) Rcpp::Rcout << draws << std::endl;
+      // } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
+      // if (draws > 1) Rcpp::Rcout << draws << std::endl;
     }
     return out;
   }
+  // this is not needed if I only consider models w/ n-k-1 latent variables
   template <typename T, typename S>
   Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const Eigen::DenseBase<S>& lambda_) {
     Vec out(nk); int draws;
@@ -67,13 +68,14 @@ class individual {
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
-    int draws = 0; bool one; bool two;
-    do {
+    int draws = 0; 
+    // bool one; bool two;
+    // do {
       x = Rcpp::rgamma(n_, shape_, scale_);
       ++draws;
-      one = Rcpp::is_true(Rcpp::any(x < 1e-13));
-      two = Rcpp::is_true(Rcpp::any(x > 1e13));
-    } while ( (one || two) && draws < max_draws);
+    //   one = Rcpp::is_true(Rcpp::any(x < 1e-13));
+    //   two = Rcpp::is_true(Rcpp::any(x > 1e13));
+    // } while ( (one || two) && draws < max_draws);
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
   }
@@ -190,7 +192,10 @@ class individual {
 
   // wrong full conditionals for double exponential conditional prior
   void upOmega2() {
-    Vec eta = rndInvGauss(std::sqrt(l2*s2)/(D*beta).cwiseAbs().array(), l2);
+    // Vec eta = rndInvGauss(std::sqrt(l2*s2)/(D*beta).cwiseAbs().array(), l2);
+    // property. if x~IG(m,l) then kx~IG(km,kl) w/ k=1/l2
+    Vec eta = rndInvGauss(std::sqrt(s2)/((D*beta).cwiseAbs().array()*std::sqrt(l2)), 1);
+    eta = eta.array()*l2;       // transform back
     o2 = eta.cwiseInverse();
 
     // update sigma_f
@@ -204,7 +209,10 @@ class individual {
 
   // full conditionals for generalized double Pareto conditional prior 
   void upOmega() {
-    Vec eta = rndInvGauss(l*std::sqrt(s2)/(D*beta).cwiseAbs().array(), l*l);
+    // Vec eta = rndInvGauss(l*std::sqrt(s2)/(D*beta).cwiseAbs().array(), l*l);
+    // property. if x~IG(m,l) then kx~IG(km,kl) w/ k=1/l^2
+    Vec eta = rndInvGauss(std::sqrt(s2)/((D*beta).cwiseAbs().array()*l), 1);
+    eta = eta.array()*(l*l);       // transform back
     o2 = eta.cwiseInverse();
     
     // update sigma_f
