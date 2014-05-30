@@ -28,7 +28,7 @@ Eigen::MatrixXd gdPBTF(const int& iter,
 
     for (int j=0; j<P; ++j) {
       if ( std::isnan(history(i,j)) ) {
-        Rcpp::Rcout << "whatch out gdp!" << std::endl;
+         Rcpp::Rcout << "whatch out gdp!, nan @ (" <<  i << "," << j << ")" << " with value " << history(i,j) << std::endl;
         return history;
       }
     }

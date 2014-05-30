@@ -27,37 +27,21 @@ class individual {
     Vec z = rndNorm(1);         // one N(0,1)
     double z2 = z(0)*z(0);
     double nu2 = nu_*nu_;
-    double x = nu_+0.5*z2*(nu2/lambda_)-(0.5*(nu_/lambda_))*std::sqrt(4.0*nu_*lambda_*z2+nu2*z2*z2);
+    double c = 0.5*nu_/lambda_;
+    double x = nu_ + c*z2*nu_ - c*std::sqrt(4.0*nu_*lambda_*z2 + nu2*z2*z2);
     Vec u = rndUniform(1);
-    if ( u(0) < nu_/(nu_+x) ) {
-      return x;
-    } else {
-      return nu2/x;
-    }
+    double out = (u(0) < nu_/(nu_+x)) ? x : nu2/x;
+    return out;
   }
   template <typename T>
   Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const double& lambda_) {
     Vec out(nk); int draws;
     for (int i=0; i<nk; i++) {
       draws = 0;
-      // do {
+      do {
         out(i) = rInvGauss(nu_(i), lambda_);        
         ++draws;
-      // } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
-      // if (draws > 1) Rcpp::Rcout << draws << std::endl;
-    }
-    return out;
-  }
-  // this is not needed if I only consider models w/ n-k-1 latent variables
-  template <typename T, typename S>
-  Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const Eigen::DenseBase<S>& lambda_) {
-    Vec out(nk); int draws;
-    for (int i=0; i<nk; i++) {
-      draws = 0;
-      do {
-        out(i) = rInvGauss(nu_(i), lambda_(i));
-        ++draws;
-      } while ( (out(i) < 1e-13 || out(i) > 1e13) && draws < max_draws);
+      } while ( (out(i) > 1e13) && draws < max_draws );
       if (draws > 1) Rcpp::Rcout << draws << std::endl;
     }
     return out;
@@ -68,14 +52,7 @@ class individual {
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
-    int draws = 0; 
-    // bool one; bool two;
-    // do {
-      x = Rcpp::rgamma(n_, shape_, scale_);
-      ++draws;
-    //   one = Rcpp::is_true(Rcpp::any(x < 1e-13));
-    //   two = Rcpp::is_true(Rcpp::any(x > 1e13));
-    // } while ( (one || two) && draws < max_draws);
+    x = Rcpp::rgamma(n_, shape_, scale_);
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
   }
@@ -116,7 +93,7 @@ class individual {
     o2 = O;
   }
   void init_s2() {
-    Vec S = rndGamma(1, 0.1, 1.0);
+    Vec S = rndGamma(1, 1.0, 0.5);
     s2 = 1.0/S(0);
   }
   void init_beta() {
@@ -161,7 +138,7 @@ class individual {
   individual(const MVec y_, const int k_, const  MspMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
 
     // general info
-    max_draws = 25;
+    max_draws = 10;
     n = y.size();
     nk = n-k-1;
 
@@ -190,12 +167,8 @@ class individual {
     s2 = 1.0/S(0);
   }
 
-  // wrong full conditionals for double exponential conditional prior
   void upOmega2() {
-    // Vec eta = rndInvGauss(std::sqrt(l2*s2)/(D*beta).cwiseAbs().array(), l2);
-    // property. if x~IG(m,l) then kx~IG(km,kl) w/ k=1/l2
-    Vec eta = rndInvGauss(std::sqrt(s2)/((D*beta).cwiseAbs().array()*std::sqrt(l2)), 1);
-    eta = eta.array()*l2;       // transform back
+    Vec eta = rndInvGauss((D*beta).cwiseAbs().cwiseInverse()*std::sqrt(l2*s2), l2);
     o2 = eta.cwiseInverse();
 
     // update sigma_f
@@ -207,12 +180,8 @@ class individual {
     l2 = lambda2(0);
   }
 
-  // full conditionals for generalized double Pareto conditional prior 
   void upOmega() {
-    // Vec eta = rndInvGauss(l*std::sqrt(s2)/(D*beta).cwiseAbs().array(), l*l);
-    // property. if x~IG(m,l) then kx~IG(km,kl) w/ k=1/l^2
-    Vec eta = rndInvGauss(std::sqrt(s2)/((D*beta).cwiseAbs().array()*l), 1);
-    eta = eta.array()*(l*l);       // transform back
+    Vec eta = rndInvGauss((D*beta).cwiseAbs().cwiseInverse()*(l*std::sqrt(s2)), l*l);
     o2 = eta.cwiseInverse();
     
     // update sigma_f
