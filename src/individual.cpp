@@ -38,11 +38,11 @@ class individual {
     Vec out(nk); int draws;
     for (int i=0; i<nk; i++) {
       draws = 0;
-      do {
+      do {                      // cut off tail
         out(i) = rInvGauss(nu_(i), lambda_);        
         ++draws;
       } while ( (out(i) > 1e13) && draws < max_draws );
-      if (draws > 1) Rcpp::Rcout << draws << std::endl;
+      if ( draws > 1 ) Rcpp::Rcout << draws << " for InvGauss." << std::endl;
     }
     return out;
   }
@@ -52,23 +52,14 @@ class individual {
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
-    x = Rcpp::rgamma(n_, shape_, scale_);
+    int draws = 0; bool toobig;
+    do {                        // cut off tail
+      x = Rcpp::rgamma(n_, shape_, scale_);
+      toobig = Rcpp::is_true( Rcpp::any( x > 1e13) );
+      ++draws;
+    } while ( toobig && draws < max_draws );
+    if ( draws > 1 ) Rcpp::Rcout << draws << " for Gamma." << std::endl;
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
-    return out;
-  }
-  template <typename T>
-  Vec rndGamma(const double& shape_, const Eigen::DenseBase<T>& scale_) {
-    Rcpp::NumericVector x(nk); int draws;
-    Rcpp::RNGScope scope; Rcpp::NumericVector tmp;
-    for (int i=0; i<nk; ++i) {
-      draws = 0;
-      do {
-        tmp = Rcpp::rgamma(1, shape_, scale_(i));
-        ++draws;
-      } while ( (tmp(0) < 1e-13 || tmp(0) > 1e13) && draws < max_draws);
-      x(i) = tmp(0);
-    }
-    Vec out(Rcpp::as<Vec>(x)); // convert to Eigen::VectorXd
     return out;
   }
   Vec rndUniform(const int& n_) {
