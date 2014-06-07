@@ -11,6 +11,7 @@ class individual {
  private:
   /* fields */
   MVec y;
+  Vec Db;
   int k, max_draws;
   MspMat D;
   spMat sigma;
@@ -39,7 +40,8 @@ class individual {
     for (int i=0; i<nk; i++) {
       draws = 0;
       do {                      // cut off tail
-        out(i) = rInvGauss(nu_(i), lambda_);        
+        out(i) = rInvGauss(nu_(i), lambda_);
+        if ( std::isnan(out(i)) ) Rcpp::Rcout << "eta is nan when nu = " << nu_(i) << " and lambda_ = " << lambda_ << std::endl;
         ++draws;
       } while ( (out(i) > 1e13) && draws < max_draws );
       if ( draws > 1 ) Rcpp::Rcout << draws << " for InvGauss." << std::endl;
@@ -52,12 +54,15 @@ class individual {
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
-    int draws = 0; bool toobig;
+    int draws = 0; bool toobig; bool toosmall;
     do {                        // cut off tail
       x = Rcpp::rgamma(n_, shape_, scale_);
       toobig = Rcpp::is_true( Rcpp::any( x > 1e13) );
+      toosmall = Rcpp::is_true( Rcpp::any( x < 1e-13) );
+      if ( toosmall ) Rcpp::Rcout << "too small Gamma draw." << std::endl;
+      if ( toobig ) Rcpp::Rcout << "too big Gamma draw." << std::endl;
       ++draws;
-    } while ( toobig && draws < max_draws );
+    } while ( (toosmall || toobig) && draws < max_draws );
     if ( draws > 1 ) Rcpp::Rcout << draws << " for Gamma." << std::endl;
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
@@ -140,6 +145,7 @@ class individual {
     init_l2();
     init_l(); 
 
+    Db = D*beta;               // initialize D*beta;
     LLt.analyzePattern(sigma); // symbolic decomposition on the sparsity
     LLt.setShift(1.0, 1.0);    // add I to Sigma_f
   }
@@ -150,7 +156,13 @@ class individual {
     spMat L(n,n); spMat Ltinv(n,n);
     LLt.matrixL().twistedBy(LLt.permutationPinv()).evalTo(L);
     Ltinv = LLt.solve(L);
-    beta = rndMVNorm(Ltinv*(Ltinv.transpose()*y), Ltinv, std::sqrt(s2));
+    int draws = 0;
+    do {
+      beta = rndMVNorm(Ltinv*(Ltinv.transpose()*y), Ltinv, std::sqrt(s2));
+      Db = D*beta;      
+      ++draws;
+    } while ( (Db.cwiseAbs().array() < 1e-10).any() && draws < max_draws );
+    if (draws > 1) Rcpp::Rcout << draws << " for Beta." << std::endl;
   }
   void upS2() {
     double rate = (y-beta).squaredNorm() + beta.transpose()*sigma*beta;
@@ -159,8 +171,9 @@ class individual {
   }
 
   void upOmega2() {
-    Vec eta = rndInvGauss((D*beta).cwiseAbs().cwiseInverse()*std::sqrt(l2*s2), l2);
-    o2 = eta.cwiseInverse();
+    Vec eta = rndInvGauss(Db.cwiseAbs().cwiseInverse()*std::sqrt(l2*s2), l2);
+    o2 = eta.cwiseInverse();    
+    if ( (o2.array() < 0.).any() ) Rcpp::Rcout << "why is at least one less than omega zero?" << std::endl;
 
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
@@ -172,8 +185,9 @@ class individual {
   }
 
   void upOmega() {
-    Vec eta = rndInvGauss((D*beta).cwiseAbs().cwiseInverse()*(l*std::sqrt(s2)), l*l);
+    Vec eta = rndInvGauss(Db.cwiseAbs().cwiseInverse()*(l*std::sqrt(s2)), l*l);
     o2 = eta.cwiseInverse();
+    if ( (o2.array() < 0.).any() ) Rcpp::Rcout << "why is at least one less than omega zero?" << std::endl;
     
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
