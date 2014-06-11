@@ -14,12 +14,12 @@ Eigen::MatrixXd dexpBTF(const int& iter,
 
   // initialize matrix of posterior draws
   int P = btf->n + btf->nk + 3; // count number of parameters
-  Eigen::MatrixXd history(iter, P); 
+  Eigen::MatrixXd history = Eigen::MatrixXd::Zero(iter, P); 
 
   // runs sampler
   for (int i=0; i<iter; ++i) {
     btf->upBeta(); btf->upS2();
-    btf->upOmega2(); btf->upLambda2(); // btf->upA(); // btf->upR();
+    btf->upLambda2(); btf->upOmega2(); // btf->upA(); // btf->upR();
     history.row(i) << btf->beta.transpose(), btf->s2, 
       btf->l2, btf->o2.transpose(), btf->alpha;
 

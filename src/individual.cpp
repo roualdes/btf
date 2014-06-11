@@ -15,6 +15,7 @@ class individual {
   int k, max_draws;
   MspMat D;
   spMat sigma;
+  double c, c2;
   Eigen::SimplicialLLT<spMat > LLt;
 
   /* random */
@@ -37,13 +38,13 @@ class individual {
   template <typename T>
   Vec rndInvGauss(const Eigen::DenseBase<T>& nu_, const double& lambda_) {
     Vec out(nk); int draws;
+    // Rcpp::Rcout << "invGauss inputs nu = " << nu_ << " and lambda = " << lambda_ << std::endl;
     for (int i=0; i<nk; i++) {
       draws = 0;
-      do {                      // cut off tail
+      do {
         out(i) = rInvGauss(nu_(i), lambda_);
-        if ( std::isnan(out(i)) ) Rcpp::Rcout << "eta is nan when nu = " << nu_(i) << " and lambda_ = " << lambda_ << std::endl;
         ++draws;
-      } while ( (out(i) > 1e13) && draws < max_draws );
+      } while ( (/*out(i) > 1e14 ||*/ out(i) < 1e-11) && draws < max_draws );
       if ( draws > 1 ) Rcpp::Rcout << draws << " for InvGauss." << std::endl;
     }
     return out;
@@ -54,15 +55,16 @@ class individual {
   } 
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
+    // Rcpp::Rcout << "Gamma inputs shape_ = " << shape_ << " and scale = " << scale_ << std::endl;
     int draws = 0; bool toobig; bool toosmall;
     do {                        // cut off tail
       x = Rcpp::rgamma(n_, shape_, scale_);
-      toobig = Rcpp::is_true( Rcpp::any( x > 1e13) );
-      toosmall = Rcpp::is_true( Rcpp::any( x < 1e-13) );
-      if ( toosmall ) Rcpp::Rcout << "too small Gamma draw." << std::endl;
-      if ( toobig ) Rcpp::Rcout << "too big Gamma draw." << std::endl;
+      toobig = Rcpp::is_true( Rcpp::any( x > 1e11) );
+      toosmall = Rcpp::is_true( Rcpp::any( x < 1e-11) );
+      if ( toosmall ) Rcpp::Rcout << "too small Gamma draw with shape = " << shape_ << " and scale = " << scale_ << std::endl;
+      // if ( toobig ) Rcpp::Rcout << "too big Gamma draw with shape = " << shape_ << " and scale = " << scale_ << std::endl;
       ++draws;
-    } while ( (toosmall || toobig) && draws < max_draws );
+    } while ( (toosmall /*|| toobig*/) && draws < max_draws );
     if ( draws > 1 ) Rcpp::Rcout << draws << " for Gamma." << std::endl;
     Vec out(Rcpp::as<Vec>(x));        // convert to Eigen::VectorXd
     return out;
@@ -122,6 +124,10 @@ class individual {
     }
     return out;
   }
+  int fact(const int& k) {
+    if (k <= 1) return k;
+    return k*fact(k-1);
+  }
 
  public:
  
@@ -137,6 +143,8 @@ class individual {
     max_draws = 10;
     n = y.size();
     nk = n-k-1;
+    c = double(fact(k)/std::pow(n, k));
+    c2 = double(std::pow(c, 2));
 
     // initialize
     init_o2();
@@ -170,20 +178,29 @@ class individual {
     s2 = 1.0/S(0);
   }
 
+  // dexp
   void upOmega2() {
-    Vec eta = rndInvGauss(Db.cwiseAbs().cwiseInverse()*std::sqrt(l2*s2), l2);
+    double tmp = (std::sqrt(l2*s2));
+    // Rcpp::Rcout << "invGauss scale = " << l2 << " and mean = " << tmp << std::endl;
+    Vec eta = rndInvGauss(Db.cwiseAbs().cwiseInverse()*tmp, l2);
+    if ( (o2.array() <= 0.).any() ) {
+      Rcpp::Rcout << "why is at least one less than omega zero?" << std::endl;
+      eta = eta.cwiseAbs();
+    }
     o2 = eta.cwiseInverse();    
-    if ( (o2.array() < 0.).any() ) Rcpp::Rcout << "why is at least one less than omega zero?" << std::endl;
 
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
     sigma.makeCompressed();
   }
   void upLambda2() {
-    Vec lambda2 = rndGamma(1, nk+alpha, 2.0/(o2.sum()+2*rho));
+    double tmp = o2.sum();
+    // Rcpp::Rcout << "sum of omegas = " << tmp << std::endl;
+    Vec lambda2 = rndGamma(1, nk+alpha, 2.0/(tmp+2*rho));
     l2 = lambda2(0);
   }
 
+  // gdP
   void upOmega() {
     Vec eta = rndInvGauss(Db.cwiseAbs().cwiseInverse()*(l*std::sqrt(s2)), l*l);
     o2 = eta.cwiseInverse();
