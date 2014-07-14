@@ -31,8 +31,7 @@ need better description of this function
 \examples{
 # Cubic trend filtering
 # from genlasso::trendfilter
-set.seed(0)
-n <- 100
+\dontrun{n <- 100
 beta0 = numeric(100)
 beta0[1:40] <- (1:40-20)^3
 beta0[40:50] <- -60*(40:50-50)^2 + 60*100+20^3
@@ -42,7 +41,7 @@ beta0 <- -beta0
 beta0 <- (beta0-min(beta0))*10/diff(range(beta0))
 y <- beta0 + rnorm(n)
 bfit <- btf(y=y, k=3)
-plot(bfit, col='grey70')
+plot(bfit, col='grey70')}
 }
 \author{
 Edward A. Roualdes

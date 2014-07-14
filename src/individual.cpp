@@ -118,10 +118,6 @@ class individual {
     }
     return out;
   }
-  int fact(const int& k) {
-    if (k <= 1) return k;
-    return k*fact(k-1);
-  }
 
  public:
  
@@ -217,11 +213,11 @@ class individual {
     std::discrete_distribution<> dA(A.begin(), A.end());
     alpha = 1.0/uniA(dA(genA)) - 1.0;
   }
-  void upR() {
-    Vec uniR = rndUniform(100);
-    std::vector<double> R = pdfR(uniR);
-    std::random_device rdR; std::mt19937 genR(rdR());
-    std::discrete_distribution<> dR(R.begin(), R.end());
-    rho = 1.0/uniR(dR(genR)) - 1.0;
-  }
+  // void upR() {
+  //   Vec uniR = rndUniform(100);
+  //   std::vector<double> R = pdfR(uniR);
+  //   std::random_device rdR; std::mt19937 genR(rdR());
+  //   std::discrete_distribution<> dR(R.begin(), R.end());
+  //   rho = 1.0/uniR(dR(genR)) - 1.0;
+  // }
 };
