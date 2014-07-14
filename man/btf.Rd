@@ -26,7 +26,9 @@ btf(y = "vector", x = NULL, k = "int", iter = 10000,
   not}
 }
 \description{
-need better description of this function
+Fits Bayesian trend filtering hierarchical model to
+univariate function. Two conditional priors are available:
+double exponential or generalized double Pareto.
 }
 \examples{
 # Cubic trend filtering
@@ -52,6 +54,6 @@ via trend filtering. The Annals of Statistics,
 42(1):285-323, 2014.
 }
 \seealso{
-\link[genlasso]{trendfilter}
+\code{\link[genlasso]{trendfilter}}
 }
 

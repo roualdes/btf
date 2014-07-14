@@ -1,12 +1,12 @@
 ##' plot btf object
 ##'
-##' Plots a btf object with optional credible intervals
+##' Plots a btf object with optional credible intervals.
 ##' @param x btf object
 ##' @param t domain of function
 ##' @param burn size of burn-in,
 ##' @param est function specifying how draws from the posterior are summarized
 ##' @param probs numeric 2-vector of credible interval probabilities; if FALSE, no credible intervals are plot
-##' @param ... extra arguments to be passed as methods
+##' @param ... extra arguments
 ##' @author Edward A. Roualdes
 ##' @aliases plot.btf
 ##' @export

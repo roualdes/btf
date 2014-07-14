@@ -1,5 +1,7 @@
-##' approximate trendfiltering via MM algorithm
+##' approximate trend filtering via MM algorithm
 ##'
+##' Uses majorization-minimization technique to approximate trend filtering fit.
+##' 
 ##' @param y observed data
 ##' @param x inputs corresponding to observations 
 ##' @param k order of fit

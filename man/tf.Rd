@@ -1,6 +1,6 @@
 \name{tf}
 \alias{tf}
-\title{approximate trendfiltering via MM algorithm}
+\title{approximate trend filtering via MM algorithm}
 \usage{
 tf(y, x = NULL, k = 2, l, D = NULL, eps = 1e-08, tau = 1e-05,
   max_iter = 500)
@@ -23,7 +23,8 @@ tf(y, x = NULL, k = 2, l, D = NULL, eps = 1e-08, tau = 1e-05,
   \item{max_iter}{maximum number of iterations allowed}
 }
 \description{
-approximate trendfiltering via MM algorithm
+Uses majorization-minimization technique to approximate
+trend filtering fit.
 }
 \author{
 Edward A. Roualdes

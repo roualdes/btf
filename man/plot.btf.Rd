@@ -18,10 +18,10 @@
   \item{probs}{numeric 2-vector of credible interval
   probabilities; if FALSE, no credible intervals are plot}
 
-  \item{...}{extra arguments to be passed as methods}
+  \item{...}{extra arguments}
 }
 \description{
-Plots a btf object with optional credible intervals
+Plots a btf object with optional credible intervals.
 }
 \author{
 Edward A. Roualdes

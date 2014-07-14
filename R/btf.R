@@ -1,6 +1,7 @@
 ##' Bayesian trend filtering via Eigen
 ##'
-##' need better description of this function
+##' Fits Bayesian trend filtering hierarchical model to univariate function.
+##' Two conditional priors are available: double exponential or generalized double Pareto. 
 ##'
 ##' @param y response vector
 ##' @param x inputs corresponding to y observations
@@ -12,7 +13,7 @@
 ##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
 ##' @author Edward A. Roualdes
-##' @seealso \link[genlasso]{trendfilter}
+##' @seealso \code{\link[genlasso]{trendfilter}}
 ##' @references R. J. Tibshirani. Adaptive piecewise polynomial estimation via trend filtering. The Annals of Statistics, 42(1):285-323, 2014.
 ##' @examples
 ##' # Cubic trend filtering
