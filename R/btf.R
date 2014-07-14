@@ -12,6 +12,8 @@
 ##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
 ##' @author Edward A. Roualdes
+##' @seealso \link[genlasso]{trendfilter}
+##' @references R. J. Tibshirani. Adaptive piecewise polynomial estimation via trend filtering. The Annals of Statistics, 42(1):285-323, 2014.
 ##' @examples
 ##' # Cubic trend filtering
 ##' # from genlasso::trendfilter

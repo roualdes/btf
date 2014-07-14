@@ -47,4 +47,12 @@ plot(bfit, col='grey70')
 \author{
 Edward A. Roualdes
 }
+\references{
+R. J. Tibshirani. Adaptive piecewise polynomial estimation
+via trend filtering. The Annals of Statistics,
+42(1):285-323, 2014.
+}
+\seealso{
+\link[genlasso]{trendfilter}
+}
 
