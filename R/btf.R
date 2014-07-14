@@ -9,10 +9,26 @@
 ##' @param cond.prior choose the conditional prior on f|sigma
 ##' @param alpha shape parameter for prior on lambda
 ##' @param rho rate parameter for prior on lambda
+##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
 ##' @author Edward A. Roualdes
+##' @examples
+##' # Cubic trend filtering
+##' # from genlasso::trendfilter
+##' set.seed(0)
+##' n <- 100
+##' beta0 = numeric(100)
+##' beta0[1:40] <- (1:40-20)^3
+##' beta0[40:50] <- -60*(40:50-50)^2 + 60*100+20^3
+##' beta0[50:70] <- -20*(50:70-50)^2 + 60*100+20^3
+##' beta0[70:100] <- -1/6*(70:100-110)^3 + -1/6*40^3 + 6000
+##' beta0 <- -beta0
+##' beta0 <- (beta0-min(beta0))*10/diff(range(beta0))
+##' y <- beta0 + rnorm(n)
+##' bfit <- btf(y=y, k=3)
+##' plot(bfit, col='grey70')
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL) {
+btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, debug=FALSE) {
 
     ## checks
     n <- length(y)
@@ -30,14 +46,14 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
         if ( missing(rho) ) rho <- 0.01 else rho <- rho
         
         ## run sampler
-        chain <- gdPBTF(iter, y, k, D, alpha, rho)
+        chain <- gdPBTF(iter, y, k, D, alpha, rho, debug)
 
     } else if ( cond.prior == 'dexp' ) {
         if ( missing(alpha) ) alpha <- 1 else alpha <- alpha
         if ( missing(rho) ) rho <- 1e-4 else rho <- rho
 
         ## run sampler
-        chain <- dexpBTF(iter, y, k, D, alpha, rho)
+        chain <- dexpBTF(iter, y, k, D, alpha, rho, debug)
 
     } else {
         stop("specified value of cond.prior not understood.")

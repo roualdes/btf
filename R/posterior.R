@@ -1,5 +1,6 @@
-##' extract posterior samples from btf object
+##' extract posterior draws from btf object
 ##'
+##' Return posterior draws from a btf object into a coda object
 ##' @param btf object
 ##' @param parameter name of the parameter of interest
 ##' @param burn number of samples to discard
@@ -13,6 +14,9 @@ getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha'),
 
 ##' get posterior estimates from btf object
 ##'
+##' Return posterior estimates, computed from btf posterior draws.
+##' User can supply their own estimating function, \code{est}, applied
+##' to the columns of \link{getPost}.
 ##' @param btf btf object
 ##' @param parameter name of the paramater of interest
 ##' @param burn number of samples to discard

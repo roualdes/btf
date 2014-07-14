@@ -15,6 +15,8 @@ getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
   \item{est}{estimate of the object}
 }
 \description{
-get posterior estimates from btf object
+Return posterior estimates, computed from btf posterior
+draws. User can supply their own estimating function,
+\code{est}, applied to the columns of \link{getPost}.
 }
 

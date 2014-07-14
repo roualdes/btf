@@ -6,7 +6,7 @@
 Eigen::MatrixXd dexpBTF(const int& iter,
                         const Eigen::Map<Eigen::VectorXd>& y, 
                         const int& k, const Eigen::MappedSparseMatrix<double>& D, 
-                        const double& alpha, const double& rho) {
+                        const double& alpha, const double& rho, const bool& debug) {
   
   // initialize btf object
   individual *btf;
@@ -19,15 +19,17 @@ Eigen::MatrixXd dexpBTF(const int& iter,
   // runs sampler
   for (int i=0; i<iter; ++i) {
     btf->upBeta(); btf->upS2();
-    btf->upLambda2(); btf->upOmega2(); // btf->upA(); // btf->upR();
+    btf->upLambda2(); btf->upOmega2();
     history.row(i) << btf->beta.transpose(), btf->s2, 
       btf->l2, btf->o2.transpose(), btf->alpha;
 
-    for (int j=0; j<P; ++j) {
-      if ( std::isnan(history(i,j)) ) {
-        Rcpp::Rcout << "whatch out dexp!, nan @ (" <<  i << "," << j << ")" << " with value " << history(i,j) << std::endl;
-        return history;
-      }
+    if ( debug ) {
+      for (int j=0; j<P; ++j) {
+        if ( std::isnan(history(i,j)) ) {
+          Rcpp::Rcout << "Warning: watch out dexp!, nan @ (" <<  i << "," << j << ")" << std::endl;
+          return history;
+        }
+      }      
     }
   }
   return history;

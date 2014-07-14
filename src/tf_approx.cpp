@@ -54,8 +54,8 @@ List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k,
       if (beta.isApprox(beta_old, tau)) break;
       ++iter;
     }
-      // store estimates for each lambda
-    beta_out.col(j) = beta;             // check notation
+    // store estimates for each lambda
+    beta_out.col(j) = beta;
     iter_out(j) = iter;
   }
 

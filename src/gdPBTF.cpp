@@ -6,7 +6,7 @@
 Eigen::MatrixXd gdPBTF(const int& iter,
                         const Eigen::Map<Eigen::VectorXd>& y, 
                         const int& k, const Eigen::MappedSparseMatrix<double>& D, 
-                        const double& alpha, const double& rho) {
+                       const double& alpha, const double& rho, const bool& debug) {
 
   // initialize btf object
   individual *btf; double a;
@@ -21,16 +21,20 @@ Eigen::MatrixXd gdPBTF(const int& iter,
   for (int i=0; i<iter; ++i) {
     btf->upBeta(); btf->upS2();
     btf->upLambda(); btf->upOmega(); 
-    if ( alpha < 0.0 ) btf->upA(); // treat alpha as parameter
-    // btf->upR();
+
+    // alpha as parameter
+    if ( alpha < 0.0 ) btf->upA(); 
+
     history.row(i) << btf->beta.transpose(), btf->s2, 
       btf->l, btf->o2.transpose(), btf->alpha;
 
-    for (int j=0; j<P; ++j) {
-      if ( std::isnan(history(i,j)) ) {
-         Rcpp::Rcout << "whatch out gdp!, nan @ (" <<  i << "," << j << ")" << " with value " << history(i,j) << std::endl;
-        return history;
-      }
+    if ( debug ) {
+      for (int j=0; j<P; ++j) {
+        if ( std::isnan(history(i,j)) ) {
+          Rcpp::Rcout << "Warning: watch out gdP!, nan @ (" <<  i << "," << j << ")" << std::endl;
+          return history;
+        }
+      }      
     }
   }
   return history;

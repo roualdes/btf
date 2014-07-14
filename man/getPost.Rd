@@ -1,6 +1,6 @@
 \name{getPost}
 \alias{getPost}
-\title{extract posterior samples from btf object}
+\title{extract posterior draws from btf object}
 \usage{
 getPost(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
   burn = 1000)
@@ -13,6 +13,6 @@ getPost(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
   \item{burn}{number of samples to discard}
 }
 \description{
-extract posterior samples from btf object
+Return posterior draws from a btf object into a coda object
 }
 

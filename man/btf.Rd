@@ -3,7 +3,8 @@
 \title{Bayesian trend filtering via Eigen}
 \usage{
 btf(y = "vector", x = NULL, k = "int", iter = 10000,
-  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL)
+  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL,
+  debug = FALSE)
 }
 \arguments{
   \item{y}{response vector}
@@ -20,9 +21,28 @@ btf(y = "vector", x = NULL, k = "int", iter = 10000,
   \item{alpha}{shape parameter for prior on lambda}
 
   \item{rho}{rate parameter for prior on lambda}
+
+  \item{debug}{boolean telling btf to check for NaNs or
+  not}
 }
 \description{
 need better description of this function
+}
+\examples{
+# Cubic trend filtering
+# from genlasso::trendfilter
+set.seed(0)
+n <- 100
+beta0 = numeric(100)
+beta0[1:40] <- (1:40-20)^3
+beta0[40:50] <- -60*(40:50-50)^2 + 60*100+20^3
+beta0[50:70] <- -20*(50:70-50)^2 + 60*100+20^3
+beta0[70:100] <- -1/6*(70:100-110)^3 + -1/6*40^3 + 6000
+beta0 <- -beta0
+beta0 <- (beta0-min(beta0))*10/diff(range(beta0))
+y <- beta0 + rnorm(n)
+bfit <- btf(y=y, k=3)
+plot(bfit, col='grey70')
 }
 \author{
 Edward A. Roualdes

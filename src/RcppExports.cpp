@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // dexpBTF
-Eigen::MatrixXd dexpBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const int& k, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho);
-RcppExport SEXP btf_dexpBTF(SEXP iterSEXP, SEXP ySEXP, SEXP kSEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP) {
+Eigen::MatrixXd dexpBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const int& k, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const bool& debug);
+RcppExport SEXP btf_dexpBTF(SEXP iterSEXP, SEXP ySEXP, SEXP kSEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -19,7 +19,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP );
         Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP );
         Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP );
-        Eigen::MatrixXd __result = dexpBTF(iter, y, k, D, alpha, rho);
+        Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP );
+        Eigen::MatrixXd __result = dexpBTF(iter, y, k, D, alpha, rho, debug);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -27,8 +28,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // gdPBTF
-Eigen::MatrixXd gdPBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const int& k, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho);
-RcppExport SEXP btf_gdPBTF(SEXP iterSEXP, SEXP ySEXP, SEXP kSEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP) {
+Eigen::MatrixXd gdPBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const int& k, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const bool& debug);
+RcppExport SEXP btf_gdPBTF(SEXP iterSEXP, SEXP ySEXP, SEXP kSEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -39,7 +40,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP );
         Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP );
         Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP );
-        Eigen::MatrixXd __result = gdPBTF(iter, y, k, D, alpha, rho);
+        Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP );
+        Eigen::MatrixXd __result = gdPBTF(iter, y, k, D, alpha, rho, debug);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
