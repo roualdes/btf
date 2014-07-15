@@ -13,10 +13,7 @@ Description: Trend filtering uses the generalized
     the genlasso framework to a fully Bayesian hierarchical model, estimating
     the penalty parameter lambda within a tractable Gibbs sampler.
 License: GPL (>= 2.0)
-Imports:
-    Rcpp (>= 0.11.0),
-    RcppEigen (>= 0.3.2.1.1),
-    Matrix,
-    coda,
-LinkingTo: Rcpp, RcppEigen
+Depends: R (>= 3.0.2)
+Imports: Matrix, coda,
+LinkingTo: Rcpp (>= 0.11.0), RcppEigen (>= 0.3.2.1.1)
 NeedsCompilation: yes

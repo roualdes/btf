@@ -1,8 +1,7 @@
 useDynLib(btf)
-import(RcppEigen, coda)
+import(coda)
 importFrom(Matrix, Matrix)
 importFrom(Matrix, bandSparse)
-importFrom(Rcpp, evalCpp)
 export(btf, getPostEst, getPost, plot.btf, tf)
 S3method("plot","btf")
 
