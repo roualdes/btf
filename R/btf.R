@@ -33,11 +33,16 @@
 btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, debug=FALSE) {
 
     ## checks
+    if ( missing(y) ) stop('must provide response vector y.')
+    if ( !is.numeric(y) ) stop('repsonse vector y must be numeric.')
+    if ( any(diff(x) == 0) ) stop("elements of x must be unique.")
+    if ( k < 0 || round(k) != k ) stop("order k must be nonnegative integer.")
+    if ( is.unsorted(x) ) stop("x must be in increasing order.")
+    if ( k>3 ) warning(paste("For numerical stability, do not run Bayesian trend filtering with a polynomial order larger than 3."))
     n <- length(y)
     if ( missing(x) ) x <- seq_len(n)/n
     nx <- length(x)
     if ( nx != n ) stop("length of x and y differ.")
-    if ( any(diff(x) <= 1e-8) ) stop("elements of x must be unique.")
 
     D <- genDelta(n, k, x)
     
@@ -67,7 +72,7 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
                          's2', 'lambda',
                          paste('omega', seq_len(n-k-1), sep=''), 'alpha')
 
-    ## append some shit for printing
+    ## append some shit for plotting
     attr(chain, 'y') <- y
     attr(chain, 'x') <- x
     class(chain) <- c('btf', class(chain))
