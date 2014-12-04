@@ -1,5 +1,6 @@
 useDynLib(btf)
 import(coda)
+import(Rcpp)
 importFrom(Matrix, Matrix)
 importFrom(Matrix, bandSparse)
 export(btf, getPostEst, getPost, plot.btf, tf)
