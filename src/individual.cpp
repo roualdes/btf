@@ -8,10 +8,9 @@ typedef Eigen::MappedSparseMatrix<double> MspMat;
 typedef Eigen::SparseMatrix<double> spMat;
 
 class individual {
- private:
+private:
   /* fields */
   MVec y;
-  Vec Db;
   int k, max_draws;
   MspMat D;
   spMat sigma;
@@ -103,28 +102,48 @@ class individual {
     return W;
   }
   std::vector<double> pdfA(const Vec& a_) {
-    int A = a_.size(); std::vector<double> out;
+    std::vector<double> out;
     double Db = 1.0 + (D*beta).lpNorm<1>()/(std::sqrt(s2)*rho);
-    for (int i=0; i<A; ++i) {
-      out.push_back(((1-a_(i))/a_(i))*std::pow(Db,-1.0*(nk - 1.0 + 1.0/a_(i))));
+    for (int i=0; i<a_.size(); ++i) {
+      out.push_back(((1.0-a_(i))/a_(i))*std::pow(Db,-1.0*(nk - 1.0 + 1.0/a_(i))));
     }
     return out;
   }
   std::vector<double> pdfR(const Vec& r_) {
-    int R = r_.size(); std::vector<double> out;
-    double Db = (D*beta).lpNorm<1>()/std::sqrt(s2);
-    for (int i=0; i<R; ++i) {
-      out.push_back(r_(i)/(1-r_(i)) * std::pow(1.0+(r_(i)/(1-r_(i)))*Db, -1.0*(nk+alpha)));
+    std::vector<double> out;
+    for (int i=0; i<r_.size(); ++i) {
+      double tmp = r_(i)/(1.0-r_(i));
+      out.push_back(tmp*std::pow(1.0 + tmp*Dbl1/std::sqrt(s2), -1.0*(nk+alpha)));
     }
     return out;
   }
+
+  std::vector<double> pdfA2(const Vec& a_) {
+    std::vector<double> out;
+    double db = 1.0 + Dbl1/(std::sqrt(s2)*rho);
+    for (int i=0; i<a_.size(); ++i) {
+      double tmp = (1.0-a_(i))/(a_(i)*a_(i)*a_(i));
+      out.push_back(tmp*std::pow(db, -1.0*(nk - 1.0 + 1.0/a_(i)))*std::exp(-1.0/a_(i)));
+    }
+    return out;
+  }
+
+  std::vector<double> pdfR2(const Vec& r_) {
+    std::vector<double> out;
+    for (int i=0; i<r_.size(); ++i) {
+      double tmp = 1.0 + r_(i)*Dbl1/(std::sqrt(s2)*(1.0-r_(i)));
+      out.push_back(std::pow(tmp, -1.0*(nk+alpha))*std::exp(-1.0/r_(i))/(r_(i)*(1.0-r_(i))));
+    }
+    return out;
+  }  
 
  public:
  
   /* fields */
   int n, nk;
   Vec beta, o2;
-  double l, l2, s2, alpha, rho;
+  double l, l2, s2, alpha, rho, Dbl1;
+  Vec Db;
 
   /* constructor */
   individual(const MVec y_, const int k_, const  MspMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
@@ -155,7 +174,8 @@ class individual {
     int draws = 0;
     do {
       beta = rndMVNorm(Ltinv*(Ltinv.transpose()*y), Ltinv, std::sqrt(s2));
-      Db = D*beta;      
+      Db = D*beta;
+      Dbl1 = (Db).lpNorm<1>();
       ++draws;
     } while ( (Db.cwiseAbs().array() < 1e-10).any() && draws < max_draws );
     if (draws > 1) Rcpp::Rcout << "Note: Normal resampled." << std::endl;
@@ -207,17 +227,20 @@ class individual {
 
   // griddy Gibbs sampler
   void upA() {
-    Vec uniA = rndUniform(250);
-    std::vector<double> A = pdfA(uniA);
-    std::random_device rdA; std::mt19937 genA(rdA());
+    Vec uniA = rndUniform(100);
+    std::vector<double> A = pdfA2(uniA);
+    std::random_device rdA;
+    std::mt19937 genA(rdA());
     std::discrete_distribution<> dA(A.begin(), A.end());
     alpha = 1.0/uniA(dA(genA)) - 1.0;
   }
-  // void upR() {
-  //   Vec uniR = rndUniform(100);
-  //   std::vector<double> R = pdfR(uniR);
-  //   std::random_device rdR; std::mt19937 genR(rdR());
-  //   std::discrete_distribution<> dR(R.begin(), R.end());
-  //   rho = 1.0/uniR(dR(genR)) - 1.0;
-  // }
+  void upR() {
+    Vec uniR = rndUniform(100);
+    std::vector<double> R = pdfR2(uniR);
+    std::random_device rdR;
+    std::mt19937 genR(rdR());
+    std::discrete_distribution<> dR(R.begin(), R.end());
+    rho = 1.0/uniR(dR(genR)) - 1.0;
+  }
 };
+

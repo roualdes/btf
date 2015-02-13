@@ -16,4 +16,3 @@ genDelta <- function(n, k, x) {
     }
     gamma(k+1)*d/n^k
 }
-

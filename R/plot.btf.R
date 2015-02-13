@@ -15,7 +15,7 @@ plot.btf <- function(x, t=NULL, burn = 1e3, est=median,
     btf <- x
     y <- attr(btf, 'y')
     n <- length(y)
-        if (missing(t)) {
+    if (missing(t)) {
         t <- (1:n)/n
     }
 

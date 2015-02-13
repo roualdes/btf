@@ -2,8 +2,8 @@
 \alias{getPostEst}
 \title{get posterior estimates from btf object}
 \usage{
-getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
-  burn = 1000, est = mean)
+getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha",
+  "rho"), burn = 1000, est = NULL)
 }
 \arguments{
   \item{btf}{btf object}
@@ -12,7 +12,8 @@ getPostEst(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
 
   \item{burn}{number of samples to discard}
 
-  \item{est}{estimate of the object}
+  \item{est}{function to estimate from the posterior
+  samples of \code{parameter}}
 }
 \description{
 Return posterior estimates, computed from btf posterior

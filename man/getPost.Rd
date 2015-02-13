@@ -2,7 +2,7 @@
 \alias{getPost}
 \title{get posterior draws from btf object}
 \usage{
-getPost(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha"),
+getPost(btf, parameter = c("beta", "s2", "lambda", "omega", "alpha", "rho"),
   burn = 1000)
 }
 \arguments{

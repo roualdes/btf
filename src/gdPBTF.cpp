@@ -9,12 +9,13 @@ Eigen::MatrixXd gdPBTF(const int& iter,
                        const double& alpha, const double& rho, const bool& debug) {
 
   // initialize btf object
-  individual *btf; double a;
+  individual *btf; double a,r;
   if ( alpha < 0.0 ) a = 1.0; else a = alpha;
-  btf = new individual(y, k, D, a, rho); 
+  if ( rho < 0.0 ) r = 1.0; else r = rho;
+  btf = new individual(y, k, D, a, r); 
 
   // initialize matrix of posterior draws
-  int P = btf->n + btf->nk + 3; // count number of parameters
+  int P = btf->n + btf->nk + 3 + 1; // count number of parameters
   Eigen::MatrixXd history = Eigen::MatrixXd::Zero(iter, P); 
 
   // runs sampler
@@ -22,11 +23,13 @@ Eigen::MatrixXd gdPBTF(const int& iter,
     btf->upBeta(); btf->upS2();
     btf->upLambda(); btf->upOmega(); 
 
-    // alpha as parameter
-    if ( alpha < 0.0 ) btf->upA(); 
+    // alpha/rho as hyperparameter
+    if ( alpha < 0.0 ) btf->upA();
+    if ( rho < 0.0 ) btf->upR();
 
+    // store samples
     history.row(i) << btf->beta.transpose(), btf->s2, 
-      btf->l, btf->o2.transpose(), btf->alpha;
+      btf->l, btf->o2.transpose(), btf->alpha, btf->rho;
 
     if ( debug ) {
       for (int j=0; j<P; ++j) {

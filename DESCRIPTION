@@ -16,7 +16,7 @@ License: GPL (>= 2.0)
 Depends:
     R (>= 3.1.0)
 Imports:
-    Rcpp,                
+    Rcpp,
     Matrix,
     coda,
 LinkingTo: Rcpp (>= 0.11.0), RcppEigen (>= 0.3.2.1.1)

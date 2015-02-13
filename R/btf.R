@@ -1,4 +1,4 @@
-##' Bayesian trend filtering via Eigen
+##' ##' Bayesian trend filtering via Eigen
 ##'
 ##' Fits Bayesian trend filtering hierarchical model to univariate function.
 ##' Two conditional priors are available: double exponential or generalized double Pareto. 
@@ -43,14 +43,13 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
     if ( missing(x) ) x <- seq_len(n)/n
     nx <- length(x)
     if ( nx != n ) stop("length of x and y differ.")
-
     D <- genDelta(n, k, x)
     
     ## which conditional prior?
     cond.prior <- match.arg(cond.prior)
     if ( cond.prior == 'gdp' ) {
         if ( missing(alpha) ) alpha <- -1.0 else alpha <- alpha  
-        if ( missing(rho) ) rho <- 0.01 else rho <- rho
+        if ( missing(rho) ) rho <- -1.0 else rho <- rho
         
         ## run sampler
         chain <- gdPBTF(iter, y, k, D, alpha, rho, debug)
@@ -70,7 +69,7 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
     chain <- as.mcmc(chain)
     varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
                          's2', 'lambda',
-                         paste('omega', seq_len(n-k-1), sep=''), 'alpha')
+                         paste('omega', seq_len(n-k-1), sep=''), 'alpha', 'rho')
 
     ## append some shit for plotting
     attr(chain, 'y') <- y
