@@ -10,6 +10,7 @@
 ##' @param cond.prior choose the conditional prior on f|sigma
 ##' @param alpha shape parameter for prior on lambda
 ##' @param rho rate parameter for prior on lambda
+##' @param D linear transformation of coefficients inside penalty
 ##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
 ##' @author Edward A. Roualdes
@@ -30,20 +31,25 @@
 ##' bfit <- btf(y=y, k=3)
 ##' plot(bfit, col='grey70')}
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, debug=FALSE) {
+btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, D='Matrix', debug=FALSE) {
 
     ## checks
-    if ( missing(y) ) stop('must provide response vector y.')
-    if ( !is.numeric(y) ) stop('repsonse vector y must be numeric.')
-    if ( any(diff(x) == 0) ) stop("elements of x must be unique.")
-    if ( k < 0 || round(k) != k ) stop("order k must be nonnegative integer.")
-    if ( is.unsorted(x) ) stop("x must be in increasing order.")
-    if ( k>3 ) warning(paste("For numerical stability, do not run Bayesian trend filtering with a polynomial order larger than 3."))
+    if (missing(y)) stop('Must provide response vector y.')
+    if (!is.numeric(y)) stop('Repsonse vector y must be numeric.')
+    if (any(diff(x) == 0)) stop("Elements of x must be unique.")
+    if (is.unsorted(x)) stop("X must be in increasing order.")
     n <- length(y)
-    if ( missing(x) ) x <- seq_len(n)/n
+    if (missing(x)) x <- seq_len(n)/n
     nx <- length(x)
-    if ( nx != n ) stop("length of x and y differ.")
-    D <- genDelta(n, k, x)
+    if (nx != n) stop("Length of x and y differ.")
+    if (missing(D) && !missing(k)) {
+        if (k < 0 || round(k) != k) stop("Order k must be nonnegative integer.")
+        if (k>3) warning(paste("For numerical stability, do not run Bayesian trend filtering with a polynomial order larger than 3."))
+        D <- genDelta(n, k, x)
+    }else if (missing(k)) {
+        stop("Need specify k.")
+    }
+    nk1 <- nrow(D)
     
     ## which conditional prior?
     cond.prior <- match.arg(cond.prior)
@@ -52,14 +58,14 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
         if ( missing(rho) ) rho <- -1.0 else rho <- rho
         
         ## run sampler
-        chain <- gdPBTF(iter, y, k, D, alpha, rho, debug)
+        chain <- gdPBTF(iter, y, D, alpha, rho, debug)
 
     } else if ( cond.prior == 'dexp' ) {
         if ( missing(alpha) ) alpha <- 1 else alpha <- alpha
         if ( missing(rho) ) rho <- 1e-4 else rho <- rho
 
         ## run sampler
-        chain <- dexpBTF(iter, y, k, D, alpha, rho, debug)
+        chain <- dexpBTF(iter, y, D, alpha, rho, debug)
 
     } else {
         stop("specified value of cond.prior not understood.")
@@ -69,7 +75,7 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
     chain <- as.mcmc(chain)
     varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
                          's2', 'lambda',
-                         paste('omega', seq_len(n-k-1), sep=''), 'alpha', 'rho')
+                         paste('omega', seq_len(nk1), sep=''), 'alpha', 'rho')
 
     ## append some shit for plotting
     attr(chain, 'y') <- y

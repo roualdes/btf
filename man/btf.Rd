@@ -1,9 +1,9 @@
 \name{btf}
 \alias{btf}
-\title{Bayesian trend filtering via Eigen}
+\title{##' Bayesian trend filtering via Eigen}
 \usage{
 btf(y = "vector", x = NULL, k = "int", iter = 10000,
-  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL,
+  cond.prior = c("gdp", "dexp"), alpha = NULL, rho = NULL, D = "Matrix",
   debug = FALSE)
 }
 \arguments{
@@ -21,6 +21,9 @@ btf(y = "vector", x = NULL, k = "int", iter = 10000,
   \item{alpha}{shape parameter for prior on lambda}
 
   \item{rho}{rate parameter for prior on lambda}
+
+  \item{D}{linear transformation of coefficients inside
+  penalty}
 
   \item{debug}{boolean telling btf to check for NaNs or
   not}

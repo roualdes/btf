@@ -11,9 +11,10 @@ class individual {
 private:
   /* fields */
   MVec y;
-  int k, max_draws;
+  int max_draws;
   MspMat D;
   spMat sigma;
+  spMat I;
   Eigen::SimplicialLLT<spMat > LLt;
 
   /* random */
@@ -92,6 +93,13 @@ private:
   }
 
   /* utility */
+  // spMat mkDiag(const int& sz) {
+  //   spMat W(sz, sz); W.reserve(sz);
+  //   for (int i=0; i<sz; i++) {
+  //     W.insert(i,i) = 1.0;
+  //   }
+  //   return W;
+  // }
   template <typename T>
   spMat mkDiag(const Eigen::DenseBase<T>& val) {
     int I = val.size();
@@ -146,12 +154,12 @@ private:
   Vec Db;
 
   /* constructor */
-  individual(const MVec y_, const int k_, const  MspMat D_, const double alpha_, const double rho_) : y(y_), k(k_), D(D_), alpha(alpha_), rho(rho_) {
+  individual(const MVec y_, const  MspMat D_, const double alpha_, const double rho_) : y(y_), D(D_), alpha(alpha_), rho(rho_) {
 
     // general info
     max_draws = 10;
     n = y.size();
-    nk = n-k-1;
+    nk = D.rows();
 
     // initialize
     init_o2();
@@ -228,7 +236,7 @@ private:
   // griddy Gibbs sampler
   void upA() {
     Vec uniA = rndUniform(100);
-    std::vector<double> A = pdfA2(uniA);
+    std::vector<double> A = pdfA(uniA);
     std::random_device rdA;
     std::mt19937 genA(rdA());
     std::discrete_distribution<> dA(A.begin(), A.end());
