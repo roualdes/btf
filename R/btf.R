@@ -54,8 +54,8 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
     ## which conditional prior?
     cond.prior <- match.arg(cond.prior)
     if ( cond.prior == 'gdp' ) {
-        if ( missing(alpha) ) alpha <- -1.0 else alpha <- alpha  
-        if ( missing(rho) ) rho <- -1.0 else rho <- rho
+        if ( missing(alpha) ) alpha <- 1 else alpha <- alpha  
+        if ( missing(rho) ) rho <- 1e-2 else rho <- rho
         
         ## run sampler
         chain <- gdPBTF(iter, y, D, alpha, rho, debug)
@@ -75,7 +75,7 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
     chain <- as.mcmc(chain)
     varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
                          's2', 'lambda',
-                         paste('omega', seq_len(nk1), sep=''), 'alpha', 'rho')
+                         paste('omega', seq_len(nk1), sep=''))
 
     ## append some shit for plotting
     attr(chain, 'y') <- y
