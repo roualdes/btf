@@ -27,7 +27,7 @@ Rcpp::List dexp(const int& iter,
     btf->upS2();
     s2_draws(i) = btf->s2;
     btf->upLambda2();
-        lambda_draws(i) = btf->l;
+    lambda_draws(i) = btf->l;
     btf->upOmega2();
     omega_draws.row(i) = btf->o2.transpose();
 
