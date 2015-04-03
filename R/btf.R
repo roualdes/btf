@@ -10,6 +10,7 @@
 ##' @param cond.prior choose the conditional prior on f|sigma
 ##' @param alpha shape parameter for prior on lambda
 ##' @param rho rate parameter for prior on lambda
+##' @param m sample f every mth iteration, default is m=1 
 ##' @param D linear transformation of coefficients inside penalty
 ##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
@@ -31,7 +32,7 @@
 ##' bfit <- btf(y=y, k=3)
 ##' plot(bfit, col='grey70')}
 ##' @export
-btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, D='Matrix', debug=FALSE) {
+btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp'), alpha=NULL, rho=NULL, D='Matrix', m=1, debug=FALSE) {
 
     ## checks
     if (missing(y)) stop('Must provide response vector y.')
@@ -58,28 +59,23 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
         if ( missing(rho) ) rho <- 1e-2 else rho <- rho
         
         ## run sampler
-        chain <- gdPBTF(iter, y, D, alpha, rho, debug)
+        chains <- gdp(iter, y, D, alpha, rho, m, debug)
 
     } else if ( cond.prior == 'dexp' ) {
         if ( missing(alpha) ) alpha <- 1 else alpha <- alpha
         if ( missing(rho) ) rho <- 1e-4 else rho <- rho
 
         ## run sampler
-        chain <- dexpBTF(iter, y, D, alpha, rho, debug)
+        chains <- dexp(iter, y, D, alpha, rho, m, debug)
 
     } else {
         stop("specified value of cond.prior not understood.")
     }
 
-    ## tidying
-    chain <- as.mcmc(chain)
-    varnames(chain) <- c(paste('beta', seq_len(n), sep=''),
-                         's2', 'lambda',
-                         paste('omega', seq_len(nk1), sep=''))
-
     ## append some shit for plotting
-    attr(chain, 'y') <- y
-    attr(chain, 'x') <- x
-    class(chain) <- c('btf', class(chain))
-    chain
+    names(chains) <- c('f', 's2', 'lambda', 'omega')
+    attr(chains, 'y') <- y
+    attr(chains, 'x') <- x
+    class(chains) <- c('btf', class(chains))
+    chains
 }

@@ -1,41 +1,39 @@
 #include <RcppEigen.h>
 
 using namespace Rcpp;
-typedef Eigen::VectorXd Vec;
-typedef Eigen::SparseMatrix<double> spMat;
 
 template <typename T>
-spMat mkDiag(const Eigen::DenseBase<T>& val) {
+Eigen::SparseMatrix<double> mkDiag(const Eigen::DenseBase<T>& val) {
   int I = val.size();
-  spMat W(I,I); W.reserve(I);
+  Eigen::SparseMatrix<double> W(I,I); W.reserve(I);
   for (int i=0; i<I; i++) {
     W.insert(i,i) = val(i);    // insert along diagonal
   }
   return W;
 }
 
-
 // [[Rcpp::export]]
-typedef Eigen::VectorXd Vec;
-typedef Eigen::SparseMatrix<double> spMat;
-List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, 
-               const double& eps, const double& tau, const int& max_iter) {
+List tf_approx(const Eigen::Map<Eigen::VectorXd>& y,
+               const Eigen::Map<Eigen::VectorXd>& l,
+               const Eigen::MappedSparseMatrix<double>& D,
+               const int& k, const double& eps,
+               const double& tau, const int& max_iter) {
   // author Edward A. Roualdes
   // initialize some values
   const int n = y.size();       // sample size
   const int nk = n-k-1;
   const int J = l.size();        // number of lambdas
-  Vec beta = y;                 // initial values
-  Vec beta_old(n);
+  Eigen::VectorXd beta = y;                 // initial values
+  Eigen::VectorXd beta_old(n);
   
   // create output containers
   Eigen::MatrixXd beta_out(n, J);        // beta out matrix
-  spMat W(nk, nk);
+  Eigen::SparseMatrix<double> W(nk, nk);
   W = mkDiag(1.0/((D*beta).cwiseAbs().array() + eps));
-  Eigen::SimplicialLLT<spMat > LLt; // linear system
+  Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > LLt; // linear system
   LLt.analyzePattern(D.transpose()*W*D); // symbolic decomposition on the sparcity
   LLt.setShift(1.0, 1.0);                // add Identity
-  Vec iter_out(J);              // store number iterations per lambda
+  Eigen::VectorXd iter_out(J);              // store number iterations per lambda
 
   // for each lambda
   for (int j=0; j<J; j++) {

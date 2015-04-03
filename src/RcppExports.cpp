@@ -6,64 +6,54 @@
 
 using namespace Rcpp;
 
-// dexpBTF
-Eigen::MatrixXd dexpBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const bool& debug);
-RcppExport SEXP btf_dexpBTF(SEXP iterSEXP, SEXP ySEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP debugSEXP) {
+// dexp
+Rcpp::List dexp(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const int& m, const bool& debug);
+RcppExport SEXP btf_dexp(SEXP iterSEXP, SEXP ySEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP mSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP );
-        Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP );
-        Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP );
-        Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP );
-        Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP );
-        Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP );
-        Eigen::MatrixXd __result = dexpBTF(iter, y, D, alpha, rho, debug);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< const int& >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP);
+    __result = Rcpp::wrap(dexp(iter, y, D, alpha, rho, m, debug));
+    return __result;
 END_RCPP
 }
-// gdPBTF
-Eigen::MatrixXd gdPBTF(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const bool& debug);
-RcppExport SEXP btf_gdPBTF(SEXP iterSEXP, SEXP ySEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP debugSEXP) {
+// gdp
+Rcpp::List gdp(const int& iter, const Eigen::Map<Eigen::VectorXd>& y, const Eigen::MappedSparseMatrix<double>& D, const double& alpha, const double& rho, const int& m, const bool& debug);
+RcppExport SEXP btf_gdp(SEXP iterSEXP, SEXP ySEXP, SEXP DSEXP, SEXP alphaSEXP, SEXP rhoSEXP, SEXP mSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP );
-        Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP );
-        Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP );
-        Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP );
-        Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP );
-        Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP );
-        Eigen::MatrixXd __result = gdPBTF(iter, y, D, alpha, rho, debug);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< const double& >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< const int& >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type debug(debugSEXP);
+    __result = Rcpp::wrap(gdp(iter, y, D, alpha, rho, m, debug));
+    return __result;
 END_RCPP
 }
 // tf_approx
-typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat; List tf_approx(const Vec& y, const Vec& l, const spMat& D, const int& k, const double& eps, const double& tau, const int& max_iter);
+List tf_approx(const Eigen::Map<Eigen::VectorXd>& y, const Eigen::Map<Eigen::VectorXd>& l, const Eigen::MappedSparseMatrix<double>& D, const int& k, const double& eps, const double& tau, const int& max_iter);
 RcppExport SEXP btf_tf_approx(SEXP ySEXP, SEXP lSEXP, SEXP DSEXP, SEXP kSEXP, SEXP epsSEXP, SEXP tauSEXP, SEXP max_iterSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< const Vec& >::type y(ySEXP );
-        Rcpp::traits::input_parameter< const Vec& >::type l(lSEXP );
-        Rcpp::traits::input_parameter< const spMat& >::type D(DSEXP );
-        Rcpp::traits::input_parameter< const int& >::type k(kSEXP );
-        Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP );
-        Rcpp::traits::input_parameter< const double& >::type tau(tauSEXP );
-        Rcpp::traits::input_parameter< const int& >::type max_iter(max_iterSEXP );
-        typedef Eigen::VectorXd Vec; typedef Eigen::SparseMatrix<double> spMat; List __result = tf_approx(y, l, D, k, eps, tau, max_iter);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type l(lSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MappedSparseMatrix<double>& >::type D(DSEXP);
+    Rcpp::traits::input_parameter< const int& >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< const double& >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< const int& >::type max_iter(max_iterSEXP);
+    __result = Rcpp::wrap(tf_approx(y, l, D, k, eps, tau, max_iter));
+    return __result;
 END_RCPP
 }

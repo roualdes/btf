@@ -2,6 +2,8 @@
 #include <vector>
 #include <random>
 
+// [[Rcpp::depends(RcppEigen)]]
+
 typedef Eigen::VectorXd Vec;
 typedef Eigen::Map<Vec> MVec;
 typedef Eigen::MappedSparseMatrix<double> MspMat;

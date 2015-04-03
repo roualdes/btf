@@ -7,11 +7,16 @@
 ##' @aliases getPost
 ##' @seealso \code{\link[btf]{getPostEst}}
 ##' @export
-getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha', 'rho'),
-                    burn=1e3) {
+getPost <- function(btf, parameter=c('f', 's2', 'lambda', 'omega'), burn=1e3) {
     parameter <- match.arg(parameter)
-    idx <- grep(parameter, varnames(btf))
-    window(btf[,idx], start=burn)
+    samples <- btf[[parameter]]
+    w <- which(samples == 0, arr.ind=TRUE)
+    if (length(w)>0) {
+        out <- samples[-unique(w[,1]),]
+    } else {
+        out <- samples
+    }
+    window(as.mcmc(out), start=burn)
 }
 
 ##' get posterior estimates from btf object
@@ -26,16 +31,11 @@ getPost <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha', '
 ##' @aliases getPostEst
 ##' @seealso \code{\link[btf]{getPost}}
 ##' @export
-getPostEst <- function(btf, parameter=c('beta', 's2', 'lambda', 'omega', 'alpha', 'rho'),
+getPostEst <- function(btf, parameter=c('f', 's2', 'lambda', 'omega'),
                        burn=1e3, est=NULL) {
     samples <- getPost(btf, parameter=match.arg(parameter), burn=burn)
     if (missing(est)) {
-        if (is.matrix(samples)) {
-            samps <- as.mcmc.list(samples)
-        } else {
-            samps <- as.mcmc(samples)
-        }
-        summary(samps)
+        summary(samples)
     } else {
         apply(as.matrix(samples),2,match.fun(est))
     }
