@@ -1,8 +1,9 @@
 useDynLib(btf)
 import(coda)
-import(Rcpp)
+importFrom(Rcpp, evalCpp)
 importFrom(Matrix, Matrix)
 importFrom(Matrix, bandSparse)
+importFrom(graphics, lines, plot)
+importFrom(stats, median, time, window)
 export(btf, getPostEst, getPost, plot.btf, tf)
 S3method("plot","btf")
-

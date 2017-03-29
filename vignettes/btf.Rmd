@@ -3,6 +3,7 @@ title: "Bayesian Trend Filtering"
 author: "Edward A. Roualdes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: refs.bib
 vignette: >
   %\VignetteIndexEntry{btf}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +12,7 @@ vignette: >
 
 ## Introduction
 
-Bayesian trend filtering estiamtes the function $f = f(x_1), \ldots, f(x_n)$ from data $y_i, i=1, \ldots, n$, hypothesized to be generated from the model $y_i = f(x_i) + \epsilon_i$ by fitting a fully Bayesian hierarchical model that is equivalent to the minimization problem $argmin_f ||y - f||_2^2 + \lambda||D^k f||_1$.  The penalty matrix $D^k$ estimates $k$th derivatives of $f$ at various inputs $x_i$.  This is the Bayesian analogue to the function [`genlasso::trendfilter`](http://cran.r-project.org/web/packages/genlasso/index.html).
+Bayesian trend filtering estiamtes the function $f = f(x_1), \ldots, f(x_n)$ from data $y_i, i=1, \ldots, n$, hypothesized to be generated from the model $$y_i = f(x_i) + \epsilon_i$$ by fitting a fully Bayesian hierarchical model that is equivalent to the minimization problem $$argmin_f ||y - f||_2^2 + \lambda||D^k f||_1$$ as detailed by R.J. Tibshirani [-@Tibshirani:2014].  The penalty matrix $D^k$ estimates $k$th derivatives of $f$ at various inputs $x_i$.  This is the Bayesian analogue to the function [`genlasso::trendfilter`](http://cran.r-project.org/web/packages/genlasso/index.html).
 
 The main function of this package, `btf::btf`, assumes the inputs $x_i, i=1, \ldots, n$, are equally spaced and in ascending order.  The user needs to specify the order of the derivatives $k$.  I recommend $k<=3$ since calculations with $D^k$ can otherwise cause numerical instability.  Note that unlike `genlasso::trendfilter` Bayesian trend filtering will not set any elements of the penalty vector $D^k f$ exactly equal to zero and thus this method should be used as a smoother.
 
@@ -43,3 +44,5 @@ A simple plot of the estimate of $f$ and highest posterior density intervals is 
 plot(fit)
 
 ```
+
+## References

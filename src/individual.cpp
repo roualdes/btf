@@ -49,7 +49,7 @@ private:
     }
     return out;
   }
-  // rndMVNorm templated? can't figure it out
+  // rndMVNorm templated?
   Vec rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
     return (scale*(sqrtCov_*rndNorm(sqrtCov_.cols()))+mu_).eval();
   } 

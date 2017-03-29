@@ -1,4 +1,4 @@
-##' ##' Bayesian trend filtering via Eigen
+##' Bayesian trend filtering via Eigen
 ##'
 ##' Fits Bayesian trend filtering hierarchical model to univariate function.
 ##' Two conditional priors are available: double exponential or generalized double Pareto. 
