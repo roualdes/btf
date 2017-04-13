@@ -1,7 +1,7 @@
 ##' Bayesian trend filtering via Eigen
 ##'
 ##' Fits Bayesian trend filtering hierarchical model to univariate function.
-##' Two conditional priors are available: double exponential or generalized double Pareto. 
+##' Two conditional priors are available: double exponential or generalized double Pareto.
 ##'
 ##' @param y response vector
 ##' @param x inputs corresponding to y observations
@@ -10,7 +10,7 @@
 ##' @param cond.prior choose the conditional prior on f|sigma
 ##' @param alpha shape parameter for prior on lambda
 ##' @param rho rate parameter for prior on lambda
-##' @param m sample f every mth iteration, default is m=1 
+##' @param m sample f every mth iteration, default is m=1
 ##' @param D linear transformation of coefficients inside penalty
 ##' @param debug boolean telling btf to check for NaNs or not
 ##' @aliases btf
@@ -20,7 +20,8 @@
 ##' @examples
 ##' # Cubic trend filtering
 ##' # from genlasso::trendfilter
-##' \dontrun{n <- 100
+##' \dontrun{
+##' n <- 100
 ##' beta0 = numeric(100)
 ##' beta0[1:40] <- (1:40-20)^3
 ##' beta0[40:50] <- -60*(40:50-50)^2 + 60*100+20^3
@@ -51,13 +52,13 @@ btf <- function(y='vector', x=NULL, k='int', iter=1e4, cond.prior=c('gdp', 'dexp
         stop("Need specify k.")
     }
     nk1 <- nrow(D)
-    
+
     ## which conditional prior?
     cond.prior <- match.arg(cond.prior)
     if ( cond.prior == 'gdp' ) {
-        if ( missing(alpha) ) alpha <- 1 else alpha <- alpha  
+        if ( missing(alpha) ) alpha <- 1 else alpha <- alpha
         if ( missing(rho) ) rho <- 1e-2 else rho <- rho
-        
+
         ## run sampler
         chains <- gdp(iter, y, D, alpha, rho, m, debug)
 
