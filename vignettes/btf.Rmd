@@ -12,7 +12,7 @@ vignette: >
 
 ## Introduction
 
-Bayesian trend filtering estiamtes the function $f = f(x_1), \ldots, f(x_n)$ from data $y_i, i=1, \ldots, n$, hypothesized to be generated from the model $$y_i = f(x_i) + \epsilon_i$$ by fitting a fully Bayesian hierarchical model that is equivalent to the minimization problem $$argmin_f ||y - f||_2^2 + \lambda||D^k f||_1$$ as detailed by R.J. Tibshirani [-@Tibshirani:2014].  The penalty matrix $D^k$ estimates $k$th derivatives of $f$ at various inputs $x_i$.  This is the Bayesian analogue to the function [`genlasso::trendfilter`](http://cran.r-project.org/web/packages/genlasso/index.html).
+Bayesian trend filtering estiamtes the function $f = f(x_1), \ldots, f(x_n)$ from data $y_i, i=1, \ldots, n$, hypothesized to be generated from the model $$y_i = f(x_i) + \epsilon_i$$ by fitting a fully Bayesian hierarchical model that is equivalent to the minimization problem $$argmin_f ||y - f||_2^2 + \lambda||D^k f||_1$$ as detailed by R.J. Tibshirani [-@Tibshirani:2014].  The penalty matrix $D^k$ estimates $k$th derivatives of $f$ at various inputs $x_i$.  This is the Bayesian analogue to the function [`genlasso::trendfilter`](https://cran.r-project.org/package=genlasso).
 
 The main function of this package, `btf::btf`, assumes the inputs $x_i, i=1, \ldots, n$, are equally spaced and in ascending order.  The user needs to specify the order of the derivatives $k$.  I recommend $k<=3$ since calculations with $D^k$ can otherwise cause numerical instability.  Note that unlike `genlasso::trendfilter` Bayesian trend filtering will not set any elements of the penalty vector $D^k f$ exactly equal to zero and thus this method should be used as a smoother.
 
@@ -25,7 +25,7 @@ library(btf)
 fit <- btf(nhtemp, k=3)
 ```
 
-The variable `fit` is nothing special, but I recommend retrieving the posterior samples with the functions `btf::getPost`.  You can specify which parameter you want to investigate, by default we assume you are interested in the estimate of $f$.  Output from this function is a `coda::mcmc` object, suitable for any of the methods specified within the [`coda`](http://cran.r-project.org/web/packages/coda/index.html) package.
+The variable `fit` is nothing special, but I recommend retrieving the posterior samples with the functions `btf::getPost`.  You can specify which parameter you want to investigate, by default we assume you are interested in the estimate of $f$.  Output from this function is a `coda::mcmc` object, suitable for any of the methods specified within the [`coda`](https://cran.r-project.org/package=coda) package.
 
 ```{r, fig.show='hold', fig.width=7, fig.height=5}
 plot(getPost(fit, 's2'))
