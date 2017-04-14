@@ -2,11 +2,11 @@
 
 // [[Rcpp::export]]
 Rcpp::List dexp(const int& iter,
-                   const Eigen::Map<Eigen::VectorXd>& y, 
-                   const Eigen::MappedSparseMatrix<double>& D, 
+                   const Eigen::Map<Eigen::VectorXd>& y,
+                   const Eigen::MappedSparseMatrix<double>& D,
                    const double& alpha, const double& rho,
                    const int& m, const bool& debug) {
-  
+
   // initialize btf object
   individual *btf;
   btf = new individual(y, D, alpha, rho);
