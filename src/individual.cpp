@@ -3,6 +3,7 @@
 #include <random>
 
 // [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins(cpp11)]]
 
 typedef Eigen::VectorXd Vec;
 typedef Eigen::Map<Vec> MVec;
@@ -25,7 +26,7 @@ private:
     Rcpp::NumericVector x = Rcpp::rnorm(n_);
     Vec out(Rcpp::as<Vec>(x));
     return out;
-  } 
+  }
   double rInvGauss(const double& nu_, const double& lambda_) {
     Vec z = rndNorm(1);         // one N(0,1)
     double z2 = z(0)*z(0);
@@ -52,7 +53,7 @@ private:
   // rndMVNorm templated?
   Vec rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
     return (scale*(sqrtCov_*rndNorm(sqrtCov_.cols()))+mu_).eval();
-  } 
+  }
   Vec rndGamma(const int& n_, const double& shape_, const double& scale_) {
     Rcpp::RNGScope scope; Rcpp::NumericVector x;
     int draws = 0; bool toosmall;
@@ -113,7 +114,7 @@ private:
   }
 
  public:
- 
+
   /* fields */
   int n, nk;
   Vec beta, o2;
@@ -133,7 +134,7 @@ private:
     init_s2();
     init_beta();
     init_l2();
-    init_l(); 
+    init_l();
 
     Db = D*beta;               // initialize D*beta;
     LLt.analyzePattern(sigma); // symbolic decomposition on the sparsity
@@ -168,7 +169,7 @@ private:
       Rcpp::Rcout << "Warning: At least one omega <= zero..." << std::endl;
       eta = eta.cwiseAbs();
     }
-    o2 = eta.cwiseInverse();    
+    o2 = eta.cwiseInverse();
 
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
@@ -189,7 +190,7 @@ private:
       Rcpp::Rcout << "Warning: At least one omega <= zero..." << std::endl;
       eta = eta.cwiseAbs();
     }
-    
+
     // update sigma_f
     sigma = D.transpose()*mkDiag(eta)*D;
     sigma.makeCompressed();
@@ -200,4 +201,3 @@ private:
     l = lambda(0);
   }
 };
-
