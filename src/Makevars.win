@@ -1,1 +1,1 @@
-USE_CXX1X =
+CXX_STD = CXX11
