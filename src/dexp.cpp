@@ -1,4 +1,8 @@
-#include "individual.cpp"
+#include "individual.h"
+#include <RcppEigen.h>
+
+// [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins(cpp11)]]
 
 // [[Rcpp::export]]
 Rcpp::List dexp(const int& iter,
@@ -7,9 +11,7 @@ Rcpp::List dexp(const int& iter,
                    const double& alpha, const double& rho,
                    const int& m, const bool& debug) {
 
-  // initialize btf object
-  individual *btf;
-  btf = new individual(y, D, alpha, rho);
+  Individual *btf = new Individual(y, D, alpha, rho);
   bool broken = false;
 
   // initialize matrix of posterior draws

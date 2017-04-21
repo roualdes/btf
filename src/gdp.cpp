@@ -1,15 +1,18 @@
-#include "individual.cpp"
+#include "individual.h"
+#include <RcppEigen.h>
+
+// [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins(cpp11)]]
 
 // [[Rcpp::export]]
 Rcpp::List gdp(const int& iter,
-                       const Eigen::Map<Eigen::VectorXd>& y, 
-                       const Eigen::MappedSparseMatrix<double>& D, 
+                       const Eigen::Map<Eigen::VectorXd>& y,
+                       const Eigen::MappedSparseMatrix<double>& D,
                        const double& alpha, const double& rho,
                        const int& m, const bool& debug) {
 
-  // initialize btf object
-  individual *btf;
-  btf = new individual(y, D, alpha, rho);
+
+  Individual *btf = new Individual(y, D, alpha, rho);
   bool broken = false;
 
   // initialize matrices of posterior draws
@@ -17,7 +20,7 @@ Rcpp::List gdp(const int& iter,
   Eigen::MatrixXd omega_draws = Eigen::MatrixXd::Zero(iter, btf->nk);
   Eigen::VectorXd s2_draws = Eigen::VectorXd::Zero(iter);
   Eigen::VectorXd lambda_draws = Eigen::VectorXd::Zero(iter);
-  
+
   // run sampler
   for (int i=0; i<iter; ++i) {
     if (i % m == 0) {
@@ -28,7 +31,7 @@ Rcpp::List gdp(const int& iter,
     s2_draws(i) = btf->s2;
     btf->upLambda();
     lambda_draws(i) = btf->l;
-    btf->upOmega(); 
+    btf->upOmega();
     omega_draws.row(i) = btf->o2.transpose();
 
     if ( debug ) {

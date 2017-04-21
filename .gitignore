@@ -9,6 +9,7 @@
 *.fff
 *.ttt
 *.aaa
+dev.R
 vignettes/cache
 vignettes/*.nav
 vignettes/*.snm
