@@ -11,7 +11,6 @@ Rcpp::List gdp(const int& iter,
                        const double& alpha, const double& rho,
                        const int& m, const bool& debug) {
 
-
   Individual *btf = new Individual(y, D, alpha, rho);
   bool broken = false;
 

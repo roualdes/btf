@@ -2,6 +2,9 @@
 
 using namespace Rcpp;
 
+// [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::plugins(cpp11)]]
+
 template <typename T>
 Eigen::SparseMatrix<double> mkDiag(const Eigen::DenseBase<T>& val) {
   int I = val.size();
@@ -25,7 +28,7 @@ List tf_approx(const Eigen::Map<Eigen::VectorXd>& y,
   const int J = l.size();        // number of lambdas
   Eigen::VectorXd beta = y;                 // initial values
   Eigen::VectorXd beta_old(n);
-  
+
   // create output containers
   Eigen::MatrixXd beta_out(n, J);        // beta out matrix
   Eigen::SparseMatrix<double> W(nk, nk);
@@ -60,6 +63,3 @@ List tf_approx(const Eigen::Map<Eigen::VectorXd>& y,
   return List::create(Named("coefficients") = beta_out,
                       Named("iters") = iter_out);
 }
-
-
-
