@@ -1,8 +1,13 @@
 language: r
+sudo: false
 cache: packages
-sudo: required
-r:
-  - oldrel
-  - release
-  - devel
-r_check_args: "--as-cran"
+
+env:
+  global:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+  - MAKEFLAGS="-j 2"
+
+include:
+- r: release
+- r: oldrel
+- r: devel
