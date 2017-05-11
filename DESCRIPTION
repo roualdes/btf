@@ -1,8 +1,8 @@
-Package: btf
 Type: Package
+Package: btf
 Title: Estimates Univariate Function via Bayesian Trend Filtering
 Version: 1.2
-Date: 2017-04-13
+Date: 2017-05-11
 Author: Edward A. Roualdes
 Maintainer: Edward A. Roualdes <eroualdes@csuchico.edu>
 Description: Trend filtering uses the generalized
@@ -16,10 +16,12 @@ License: GPL (>= 2.0)
 Depends:
     R (>= 3.1.0)
 Imports:
-    Rcpp (>= 0.11.2),
+    Rcpp (>= 0.12.0),
     Matrix,
     coda,
-LinkingTo: Rcpp (>= 0.11.2), RcppEigen (>= 0.3.2.2.0)
+LinkingTo: Rcpp (>= 0.12.0),
+    RcppEigen (>= 0.3.2.2.0)
+VignetteBuilder: knitr
 NeedsCompilation: yes
 Suggests: knitr
-VignetteBuilder: knitr
+

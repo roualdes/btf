@@ -2,12 +2,13 @@ language: r
 sudo: false
 cache: packages
 
+r_build_args: "--no-build-vignettes"
+
 env:
   global:
-  - _R_CHECK_FORCE_SUGGESTS_=false
   - MAKEFLAGS="-j 2"
 
-include:
-- r: release
-- r: oldrel
-- r: devel
+r:
+  - oldrel
+  - release
+  - devel
