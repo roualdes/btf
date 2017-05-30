@@ -6,12 +6,13 @@
 
 // [[Rcpp::export]]
 Rcpp::List gdp(const int& iter,
-                       const Eigen::Map<Eigen::VectorXd>& y,
-                       const Eigen::MappedSparseMatrix<double>& D,
-                       const double& alpha, const double& rho,
-                       const int& m, const bool& debug) {
+               const Eigen::Map<Eigen::VectorXd>& y,
+               const Eigen::MappedSparseMatrix<double>& D,
+               const double& alpha, const double& rho,
+               const int& m, const bool& debug) {
 
-  Individual *btf = new Individual(y, D, alpha, rho);
+  Individual b = Individual(y, D, alpha, rho);
+  Individual *btf = &b;
   bool broken = false;
 
   // initialize matrices of posterior draws
@@ -26,6 +27,7 @@ Rcpp::List gdp(const int& iter,
       btf->upBeta();
       beta_draws.row(i) = btf->beta.transpose();
     }
+
     btf->upS2();
     s2_draws(i) = btf->s2;
     btf->upLambda();

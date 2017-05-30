@@ -14,5 +14,5 @@ genDelta <- function(n, k, x) {
         z <- x[idx]
         d[i,idx] <- tmp*sapply(seq_along(z),function(j) 1/prod(z[j]-z[-j]))
     }
-    gamma(k+1)*d/n^k
+    1.0*gamma(k+1)*d/n^k
 }

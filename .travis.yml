@@ -2,8 +2,6 @@ language: r
 sudo: false
 cache: packages
 
-r_build_args: "--no-build-vignettes"
-
 env:
   global:
   - MAKEFLAGS="-j 2"

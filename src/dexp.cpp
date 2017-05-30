@@ -11,7 +11,8 @@ Rcpp::List dexp(const int& iter,
                    const double& alpha, const double& rho,
                    const int& m, const bool& debug) {
 
-  Individual *btf = new Individual(y, D, alpha, rho);
+  Individual b = Individual(y, D, alpha, rho);
+  Individual *btf = &b;
   bool broken = false;
 
   // initialize matrix of posterior draws

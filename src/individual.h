@@ -47,6 +47,7 @@ class Individual {
 
 
   Individual(const MVec y_, const  MspMat D_, const double alpha_, const double rho_);
+  Individual(const Individual& i);
 
 };
 

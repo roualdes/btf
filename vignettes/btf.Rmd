@@ -18,23 +18,23 @@ The main function of this package, `btf::btf`, assumes the inputs $x_i, i=1, \ld
 
 ## Fitting btf
 
-We'll use the time-series observations `datasets::nhtemp`.  First, fit a model by specifying the observations $y$ and the order of the derivative to use.
+We'll use the time-series observations `datasets::nhtemp`.  First, fit a model by specifying the observations $y$, the order of the derivative to use, and possibly the number of iterations.
 
 ```{r}
 library(btf)
-fit <- btf(nhtemp, k=3)
+fit <- btf(nhtemp, k=2, iter=2000)
 ```
 
 The variable `fit` is nothing special, but I recommend retrieving the posterior samples with the functions `btf::getPost`.  You can specify which parameter you want to investigate, by default we assume you are interested in the estimate of $f$.  Output from this function is a `coda::mcmc` object, suitable for any of the methods specified within the [`coda`](https://cran.r-project.org/package=coda) package.
 
 ```{r, fig.show='hold', fig.width=7, fig.height=5}
-plot(getPost(fit, 's2'))
+s2_sample <- getPost(fit, 's2')
+plot(s2_sample)
 ```
 
-Alternatively, you can ask for a summary of the parameters requested.  The function `btf::getPostEst` will give the output from `coda::summary.mcmc` applied to the parameters specified, or $f$ is no paramters are specified.  You can also specify a function be applied to each of the paramters requested.
+Alternatively, you can ask for a summary of the parameters requested.  The function `btf::getPostEst` will give the output from `coda::summary.mcmc` applied to the parameters specified, or $f$ is no paramters are specified.  You can also specify a function, via the named argument `est`, to be applied to each of the paramters requested
 
 ```{r}
-getPostEst(fit, 's2')
 getPostEst(fit, 's2', est=mean)
 ```
 
@@ -42,7 +42,6 @@ A simple plot of the estimate of $f$ and highest posterior density intervals is 
 
 ```{r, fig.show='hold', fig.width=5, fig.height=5}
 plot(fit)
-
 ```
 
 ## References

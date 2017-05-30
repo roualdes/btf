@@ -22,6 +22,5 @@ Imports:
 LinkingTo: Rcpp (>= 0.12.0),
     RcppEigen (>= 0.3.2.2.0)
 VignetteBuilder: knitr
-NeedsCompilation: yes
 Suggests: knitr
-
+RoxygenNote: 6.0.1

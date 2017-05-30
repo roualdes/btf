@@ -43,7 +43,6 @@ Vec Individual::rndInvGauss(const Eigen::DenseBase<T>& nu_, const double& lambda
   return out;
 }
 
-// rndMVNorm templated?
 Vec Individual::rndMVNorm(const Vec& mu_, const spMat& sqrtCov_, const double& scale) {
   return (scale*(sqrtCov_*rndNorm(sqrtCov_.cols()))+mu_).eval();
 }
@@ -132,12 +131,33 @@ Individual::Individual(const MVec y_, const  MspMat D_, const double alpha_, con
   LLt.setShift(1.0, 1.0);    // add I to Sigma_f
 }
 
+Individual::Individual(const Individual& i) : y(i.y), D(i.D), alpha(i.alpha), rho(i.rho) {
+  // general info
+  max_draws = 10;
+  n = y.size();
+  nk = D.rows();
+
+  // initialize
+  init_o2();
+  init_s2();
+  init_beta();
+  init_l2();
+  init_l();
+
+  // TODO
+  Db = D*beta;               // initialize D*beta;
+  LLt.analyzePattern(sigma); // symbolic decomposition on the sparsity
+  LLt.setShift(1.0, 1.0);    // add I to Sigma_f
+
+}
+
 /* update parameters */
 void Individual::upBeta() {
   LLt.factorize(sigma);
   spMat L(n,n); spMat Ltinv(n,n);
-  LLt.matrixL().twistedBy(LLt.permutationPinv()).evalTo(L);
+  L = LLt.matrixL().twistedBy(LLt.permutationPinv());
   Ltinv = LLt.solve(L);
+
   int draws = 0;
   do {
     beta = rndMVNorm(Ltinv*(Ltinv.transpose()*y), Ltinv, std::sqrt(s2));

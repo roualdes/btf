@@ -10,8 +10,8 @@
 ##' @author Edward A. Roualdes
 ##' @aliases plot.btf
 ##' @export
-plot.btf <- function(x, t=NULL, burn = 1e3, ptest=median,
-                     prob = 0.95, ...) {
+plot.btf <- function(x, t=NULL, burn=500, ptest=median,
+                     prob=0.95, ...) {
     btf <- x
     y <- attr(btf, 'y')
     n <- length(y)
@@ -32,6 +32,6 @@ plot.btf <- function(x, t=NULL, burn = 1e3, ptest=median,
          xlab = 'x', ylab='f(x)', ...)
     lines(t, fits, col="#1AB2FF", lwd=2)
     lines(t, q[,1], col = "#1AB2FF", lty=2, lwd=2)
-    lines(t, q[,2], col = "#1AB2FF", lty=2, lwd=2)        
-    
+    lines(t, q[,2], col = "#1AB2FF", lty=2, lwd=2)
+
 }
